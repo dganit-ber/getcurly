@@ -2,9 +2,9 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Server-side Supabase client using the service-role key. Used only inside API
- * route handlers for Storage uploads and `products` writes/reads. Never import
- * this from a client component.
+ * Server-side Supabase client using the service-role key. Used only inside the
+ * `/api/products` route handlers (add + search products). The label-upload / OCR
+ * flow does NOT use Supabase. Never import this from a client component.
  */
 export function createServerSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -20,5 +20,3 @@ export function createServerSupabaseClient() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
-
-export const LABELS_BUCKET = process.env.SUPABASE_LABELS_BUCKET || "labels";

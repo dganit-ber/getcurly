@@ -27,15 +27,6 @@ create policy "public insert products"
   on public.products for insert
   with check (true);
 
--- ---------------------------------------------------------------------------
--- Storage bucket for uploaded label images (replaces the old AWS S3 bucket
--- "dganitsocialnetwork"). You can also create this from the dashboard:
---   Storage -> New bucket -> name "labels", Public.
--- ---------------------------------------------------------------------------
-insert into storage.buckets (id, name, public)
-values ('labels', 'labels', true)
-on conflict (id) do nothing;
-
-create policy "public read labels"
-  on storage.objects for select
-  using (bucket_id = 'labels');
+-- Note: uploaded label images are NOT stored. The /api/upload route sends the
+-- image bytes straight to Google Cloud Vision for OCR and discards them, so no
+-- Storage bucket is needed (the old app used an AWS S3 bucket for this).

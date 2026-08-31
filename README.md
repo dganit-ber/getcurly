@@ -32,9 +32,13 @@ Rebuilt on:
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **Tailwind CSS v4** (the original design, ported)
-- **Supabase** — Postgres (`products` table) + Storage (uploaded label images)
-- **Google Cloud Vision** (`@google-cloud/vision` v5) for OCR
+- **Google Cloud Vision** (`@google-cloud/vision` v5) for OCR — the only thing the upload flow needs
+- **Supabase** Postgres — only for the *add product* / *search products* pages
 - **Vitest** for tests
+
+The label upload sends the image straight to Google Vision for OCR and discards it — no
+database or file storage involved. Supabase is independent: if it isn't configured, only
+`/products` and `/search` are affected.
 
 See [DEPRECATIONS.md](DEPRECATIONS.md) for the full old→new library log and notes on the old
 AWS S3 / SES / `spiced-pg` setup that was removed.
@@ -46,17 +50,17 @@ AWS S3 / SES / `spiced-pg` setup that was removed.
    npm install
    ```
 
-2. Create a Supabase project. In the SQL editor, run
-   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql). Confirm a public
-   Storage bucket named `labels` exists.
-
-3. Create a Google Cloud project, enable the **Cloud Vision API**, and create a service
-   account with the *Cloud Vision API User* role. Download its JSON key and base64-encode it:
+2. **For the OCR upload flow (required):** create a Google Cloud project, enable the
+   **Cloud Vision API**, create a service account with the *Cloud Vision API User* role,
+   download its JSON key and base64-encode it:
    ```bash
    base64 -i service-account.json
    ```
 
-4. Copy the env template and fill it in:
+3. **For the products pages (optional):** create a Supabase project and run
+   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) in its SQL editor.
+
+4. Copy the env template and fill in what you need:
    ```bash
    cp .env.local.example .env.local
    ```

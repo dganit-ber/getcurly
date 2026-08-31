@@ -2,8 +2,12 @@
 
 This project (originally a 2020 Spiced Academy graduation project, `spiced-social-network`)
 was converted from a hand-rolled Webpack 4 + Express + Redux app on React 16.9-**alpha** to a
-current **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4** app backed by
-**Supabase** (Postgres + Storage).
+current **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4** app.
+
+- The **label upload / OCR flow** needs only **Google Cloud Vision** — the image is sent
+  straight to Vision for OCR and discarded. No database, no object storage.
+- **Supabase Postgres** backs only the *add product* and *search products* pages. If it is
+  not configured, those two pages error independently; the upload flow is unaffected.
 
 Functionality and the visual design are preserved. Code was not refactored beyond what the
 JS→TSX move, the Express→route-handler move, and the removal of Redux/react-router required.
@@ -16,7 +20,7 @@ JS→TSX move, the Express→route-handler move, and the removal of Redux/react-
 | --- | --- | --- | --- |
 | **PostgreSQL via `spiced-pg`** | Spiced Academy teaching wrapper around node-postgres `pg` ^6. Connected via `DATABASE_URL` or a local DB named `final`. | `db.js` | **Supabase Postgres**. One table is actually used: `products(id, name, brand, type, cg_approved, code)`. Recreated in `supabase/migrations/0001_init.sql`. |
 | Commented `users` / `friends` tables | Never created or queried — leftovers from the bootcamp social-network starter. | `db.js` comments | Dropped. |
-| **AWS S3** | Stored uploaded label images (bucket `dganitsocialnetwork`) before OCR. | `s3.js`, `config.json` | **Supabase Storage** bucket `labels` (public). |
+| **AWS S3** | Stored uploaded label images (bucket `dganitsocialnetwork`) before OCR. | `s3.js`, `config.json` | **Removed.** `/api/upload` sends the image bytes straight to Google Vision and discards them — nothing in the app used the stored images. No object storage is used. |
 | **AWS SES** | Configured for transactional email but never wired to any route. | `src/ses.js` | Removed. If email is needed later, use Supabase or a provider like Resend. |
 
 **Data:** there are **no data files in this repo** — no SQL dumps, seeds, or migrations, only
@@ -37,12 +41,12 @@ Import data from CSV**.
 
 ## Libraries removed
 
-### Replaced by Supabase
+### Database / AWS removed
 | Package | Old version | Library status | Action |
 | --- | --- | --- | --- |
-| `spiced-pg` | ^1.0.0 | Unmaintained teaching wrapper | Removed → `@supabase/supabase-js` |
+| `spiced-pg` | ^1.0.0 | Unmaintained teaching wrapper | Removed → `@supabase/supabase-js` (products only) |
 | `pg` (transitive) | ^6.1.0 | Very old (current 8.x) | Removed |
-| `aws-sdk` | ^2.497.0 | v2 is in maintenance mode / effectively end-of-life; v3 is the modular `@aws-sdk/*` | Removed (S3 + SES) → Supabase Storage |
+| `aws-sdk` | ^2.497.0 | v2 is in maintenance mode / effectively end-of-life; v3 is the modular `@aws-sdk/*` | Removed. S3 (label images) → not replaced, images aren't stored. SES (email) → not replaced. |
 
 ### Dead code / never actually used
 | Package | Old version | Library status | Action |

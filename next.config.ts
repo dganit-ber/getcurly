@@ -1,27 +1,11 @@
 import type { NextConfig } from "next";
 
-const supabaseHost = (() => {
-  try {
-    return process.env.NEXT_PUBLIC_SUPABASE_URL
-      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-      : undefined;
-  } catch {
-    return undefined;
-  }
-})();
-
 const nextConfig: NextConfig = {
   // Don't auto-generate AGENTS.md / CLAUDE.md on build.
   agentRules: false,
 
   // `@google-cloud/vision` is a heavy Node-only dependency; keep it external to the bundle.
   serverExternalPackages: ["@google-cloud/vision"],
-
-  images: {
-    remotePatterns: supabaseHost
-      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
-      : [],
-  },
 
   async redirects() {
     // Was: app.get("/welcome", (req, res) => res.redirect("/")) in the old Express server.
