@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { TextField } from "@/components/TextField";
+import { BrandField } from "@/components/BrandField";
 
-export default function ProductForm() {
+export const ProductForm = () => {
   const [values, setValues] = useState<{
     productName?: string;
     brandname?: string;
@@ -42,79 +44,123 @@ export default function ProductForm() {
     }
   }
 
-  const field =
-    "registerfield mt-[30px] w-[70%] self-center rounded-[7px] border-2 border-blue bg-white px-2 font-sans text-[1.2rem] leading-[5] text-black";
+  const choice =
+    "flex-1 cursor-pointer rounded-full border py-2.5 text-center text-sm font-medium transition-colors";
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="mx-auto w-full max-w-md px-5 py-8">
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        Add a product
+      </h1>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+        Help the database grow. Anything you add shows up in search.
+      </p>
+
       {error && (
-        <div className="font-bold text-red-600">something went wrong, please try again.</div>
+        <p className="mt-4 rounded-xl bg-bad-bg px-3.5 py-3 text-[13px] text-bad">
+          Something went wrong, please try again.
+        </p>
       )}
 
-      <input
-        className={`${field} productName`}
-        name="productName"
-        placeholder="Product name"
-        value={values.productName ?? ""}
-        onChange={handleChange}
-      />
-      {values.productName === undefined && error && (
-        <div className="font-bold text-red-600">Please fill in product&apos;s name!</div>
-      )}
-
-      <input
-        className={`${field} BrandName`}
-        name="brandname"
-        placeholder="Brand name"
-        value={values.brandname ?? ""}
-        onChange={handleChange}
-      />
-      {values.brandname === undefined && error && (
-        <div className="font-bold text-red-600">Please fill in the brand name!</div>
-      )}
-
-      <input
-        className={`${field} productType`}
-        name="producttype"
-        placeholder="Product Type"
-        value={values.producttype ?? ""}
-        onChange={handleChange}
-      />
-      {values.producttype === undefined && error && (
-        <div className="font-bold text-red-600">Please fill in the product type!</div>
-      )}
-
-      <div className="flex flex-col items-center justify-center font-sans text-[30px]">
-        <p>Does this product fits the CG system?</p>
-        <input
-          id="radiotrue"
-          type="radio"
-          name="fitsSystem"
-          value="true"
-          checked={values.fitsSystem === "true"}
-          onChange={handleChangeButtons}
+      <div className="mt-6 flex flex-col gap-4">
+        <TextField
+          name="productName"
+          label="Product name"
+          value={values.productName ?? ""}
+          onChange={handleChange}
+          error={
+            values.productName === undefined && error
+              ? "Please fill in the product's name."
+              : undefined
+          }
         />
-        <label htmlFor="radiotrue">Yes</label>
-        <input
-          id="radiofalse"
-          type="radio"
-          name="fitsSystem"
-          value="false"
-          checked={values.fitsSystem === "false"}
-          onChange={handleChangeButtons}
+
+        <BrandField
+          value={values.brandname ?? ""}
+          onChange={(brandname) =>
+            setValues((prev) => ({ ...prev, brandname }))
+          }
+          error={
+            values.brandname === undefined && error
+              ? "Please fill in the brand name."
+              : undefined
+          }
         />
-        <label htmlFor="radiofalse">No</label>
+
+        <TextField
+          name="producttype"
+          label="Product type"
+          value={values.producttype ?? ""}
+          onChange={handleChange}
+          error={
+            values.producttype === undefined && error
+              ? "Please fill in the product type."
+              : undefined
+          }
+        />
+
+        <fieldset className="flex flex-col gap-1.5">
+          <legend className="text-xs text-muted">
+            Does this product fit the CG method?
+          </legend>
+
+          <div className="mt-1.5 flex gap-2.5">
+            <label
+              htmlFor="radiotrue"
+              className={`${choice} ${
+                values.fitsSystem === "true"
+                  ? "border-ok bg-ok-bg text-ok"
+                  : "border-line text-ink"
+              }`}
+            >
+              <input
+                id="radiotrue"
+                type="radio"
+                name="fitsSystem"
+                value="true"
+                checked={values.fitsSystem === "true"}
+                onChange={handleChangeButtons}
+                className="sr-only"
+              />
+              Yes
+            </label>
+
+            <label
+              htmlFor="radiofalse"
+              className={`${choice} ${
+                values.fitsSystem === "false"
+                  ? "border-bad bg-bad-bg text-bad"
+                  : "border-line text-ink"
+              }`}
+            >
+              <input
+                id="radiofalse"
+                type="radio"
+                name="fitsSystem"
+                value="false"
+                checked={values.fitsSystem === "false"}
+                onChange={handleChangeButtons}
+                className="sr-only"
+              />
+              No
+            </label>
+          </div>
+        </fieldset>
+
+        <button
+          type="button"
+          onClick={submit}
+          className="mt-2 w-full rounded-full bg-brand py-3.5 text-[15px] font-bold text-bg"
+        >
+          Submit
+        </button>
+
+        {thanks && (
+          <p className="rounded-xl bg-ok-bg px-3.5 py-3 text-[13px] text-ok">
+            Thank you! This product has been logged in our database.
+          </p>
+        )}
       </div>
-
-      <button
-        type="button"
-        onClick={submit}
-        className="curly-rainbow-hover mt-7.5 h-[7vh] self-center rounded-[10px] border-2 border-black bg-mint font-sans text-[40px] text-black"
-      >
-        Submit now!
-      </button>
-
-      {thanks && <p>Thank you! This product has been logged in our database</p>}
     </div>
   );
-}
+};

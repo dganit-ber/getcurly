@@ -2,25 +2,26 @@
 
 import Link from "next/link";
 import { useResult } from "@/components/ResultContext";
-import ResultView from "@/components/ResultView";
+import { ResultView } from "@/components/ResultView";
 
 export default function ResultsPage() {
   const { outcome } = useResult();
 
   if (!outcome) {
     return (
-      <div className="flex flex-col items-center gap-4 p-10 text-center">
-        <p className="font-sans text-[30px]">No results yet.</p>
-        <Link href="/" className="font-sans text-[20px] underline">
+      <div className="mx-auto w-full max-w-md px-5 py-8">
+        <p className="font-display text-2xl font-semibold tracking-tight">
+          No results yet
+        </p>
+        <Link
+          href="/"
+          className="mt-3 inline-block text-sm font-bold text-brand"
+        >
           Upload a product label first
         </Link>
       </div>
     );
   }
 
-  return (
-    <div className="flex w-full flex-col items-center pt-10">
-      <ResultView outcome={outcome} />
-    </div>
-  );
+  return <ResultView outcome={outcome} />;
 }

@@ -1,34 +1,52 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import type { OcrOutcome } from "@/components/ResultContext";
+import { AccordionSection } from "@/components/AccordionSection";
+import { Coil } from "@/components/Coil";
 
-const growLine = (
-  <p className="grow self-center text-center font-sans text-[30px]">
-    help us grow! Add this produt to our <Link href="/products">Database</Link>
+const GrowLine = () => (
+  <p className="mt-6 text-center text-[13px] text-muted">
+    Help us grow — add this product to our{" "}
+    <Link href="/products" className="font-bold text-brand">
+      database
+    </Link>
+    .
   </p>
 );
 
-export default function ResultView({ outcome }: { outcome: NonNullable<OcrOutcome> }) {
-  const [openPanels, setOpenPanels] = useState<Record<number, boolean>>({});
-  const toggle = (i: number) =>
-    setOpenPanels((prev) => ({ ...prev, [i]: !prev[i] }));
+const Verdict = ({
+  tone,
+  heading,
+  blurb,
+}: {
+  tone: string;
+  heading: string;
+  blurb: string;
+}) => (
+  <div className="flex items-center gap-3.5">
+    <Coil tone={tone} />
+    <div>
+      <p className="font-display text-xl font-semibold tracking-tight">
+        {heading}
+      </p>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{blurb}</p>
+    </div>
+  </div>
+);
 
+export const ResultView = ({
+  outcome,
+}: {
+  outcome: NonNullable<OcrOutcome>;
+}) => {
   if (outcome.status === "error") {
     return (
-      <div className="flex w-full flex-col items-center">
-        <Image
-          src="/1_NWsriD1xdDlAlbm4tmjz4g.jpeg"
-          alt=""
-          width={800}
-          height={450}
-          className="w-4/5 self-center"
-        />
-        <p className="max-w-[60%] self-center font-sans text-[30px] font-bold">
-          On no! Something went wrong :( We&apos;re not exactly sury why, but please try
-          again! Make sure you are loading an image with text on it.
+      <div className="mx-auto w-full max-w-md px-5 py-8">
+        <p className="font-display text-2xl font-semibold tracking-tight">
+          Something went wrong
+        </p>
+        <p className="mt-2 text-[13px] leading-relaxed text-muted">
+          We&apos;re not sure why. Try again, and make sure the photo shows the
+          ingredients list.
         </p>
       </div>
     );
@@ -36,53 +54,49 @@ export default function ResultView({ outcome }: { outcome: NonNullable<OcrOutcom
 
   if (outcome.status === "cool") {
     return (
-      <div className="flex flex-col items-center justify-center">
-        <div className="flex h-25 items-center justify-around">
-          <Image src="/go.png" alt="" width={50} height={50} className="h-12.5 w-auto" />
-          <p className="font-sans text-[30px] font-bold">
-            COOL! This product Is cool for curlies.
-          </p>
-        </div>
-        <div>{growLine}</div>
+      <div className="mx-auto w-full max-w-md px-5 py-8">
+        <Verdict
+          tone="stroke-ok"
+          heading="Nothing flagged"
+          blurb="None of the ingredients we read are on the avoid list."
+        />
+        <GrowLine />
       </div>
     );
   }
 
+  const flagged = outcome.groups.filter((g) => g[0]);
+  const total = flagged.reduce((n, g) => n + g.length, 0);
+
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex h-25 items-center justify-around">
-        <Image src="/stop.png" alt="" width={50} height={50} className="h-12.5 w-auto" />
-        <p className="font-sans text-[30px] font-bold">
-          STOP! This product isnt compatible with the CG method.
-        </p>
+    <div className="mx-auto w-full max-w-md px-5 py-8">
+      <Verdict
+        tone="stroke-bad"
+        heading={`${total} to avoid`}
+        blurb="This product isn't compatible with the Curly Girl method."
+      />
+
+      <div className="mt-3 border-t border-line">
+        {flagged.map((group, i) => (
+          <AccordionSection key={i} title={group[0].type} count={group.length}>
+            <ul>
+              {group.map((result, item) => (
+                <li key={item} className="py-2">
+                  <span className="block text-[13px] font-medium capitalize">
+                    {result.name}
+                  </span>
+                  {/* Placeholder: lib/ingredients.ts has no real descriptions yet. */}
+                  <span className="block text-xs leading-relaxed text-muted">
+                    Explanation coming soon.
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </AccordionSection>
+        ))}
       </div>
 
-      <div className="flex w-full flex-col items-center">
-        {outcome.groups.map((group, i) =>
-          group[0] ? (
-            <div key={i} className="w-full">
-              <button
-                type="button"
-                onClick={() => toggle(i)}
-                className="curly-gradient w-full cursor-pointer border-none px-[15%] py-4.5 text-left font-sans text-[30px] capitalize text-[#444] shadow-row outline-none transition"
-              >
-                {group[0].type}
-              </button>
-              {openPanels[i] && (
-                <div className="w-full self-start overflow-hidden bg-white px-4.5 font-sans text-[20px] capitalize">
-                  {group.map((result, item) => (
-                    <p key={item} className="capitalize">
-                      {result.name}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null
-        )}
-      </div>
-
-      {growLine}
+      <GrowLine />
     </div>
   );
-}
+};

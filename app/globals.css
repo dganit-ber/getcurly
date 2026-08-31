@@ -1,11 +1,67 @@
 @import "tailwindcss";
 
-@import "tailwindcss";
+/* ── New design tokens ──────────────────────────────────────── */
+:root {
+  --gc-bg: #e9efeb;
+  --gc-surface: #ffffff;
+  --gc-sunk: #dce5e0;
+  --gc-ink: #12211d;
+  --gc-muted: #5f736c;
+  --gc-line: rgba(18, 33, 29, 0.13);
+  --gc-brand: #14514a;
+  --gc-gold: #d39a25;
+  --gc-ok: #2c7a5b;
+  --gc-ok-bg: #dcede4;
+  --gc-warn: #b0761a;
+  --gc-warn-bg: #f6e9d2;
+  --gc-bad: #b33f3a;
+  --gc-bad-bg: #f6dedb;
+  --gc-shell: rgba(233, 239, 235, 0.92);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gc-bg: #0e1917;
+    --gc-surface: #182422;
+    --gc-sunk: #101b19;
+    --gc-ink: #e7efea;
+    --gc-muted: #8ca49c;
+    --gc-line: rgba(231, 239, 234, 0.14);
+    --gc-brand: #7fd0bc;
+    --gc-gold: #e7b54a;
+    --gc-ok: #6bc79c;
+    --gc-ok-bg: #15302a;
+    --gc-warn: #e0a94e;
+    --gc-warn-bg: #2e2517;
+    --gc-bad: #e88079;
+    --gc-bad-bg: #33201f;
+    --gc-shell: rgba(14, 25, 23, 0.92);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--gc-bg);
+  --color-surface: var(--gc-surface);
+  --color-sunk: var(--gc-sunk);
+  --color-ink: var(--gc-ink);
+  --color-muted: var(--gc-muted);
+  --color-line: var(--gc-line);
+  --color-brand: var(--gc-brand);
+  --color-gold: var(--gc-gold);
+  --color-ok: var(--gc-ok);
+  --color-ok-bg: var(--gc-ok-bg);
+  --color-warn: var(--gc-warn);
+  --color-warn-bg: var(--gc-warn-bg);
+  --color-bad: var(--gc-bad);
+  --color-bad-bg: var(--gc-bad-bg);
+  --color-shell: var(--gc-shell);
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-karla), system-ui, sans-serif;
+}
 
 /*
- * Design tokens ported from the old public/style.css so the look is unchanged:
- * mint background, blue top bar / sidebar, purple uploader panel, lavender->slate
- * gradient nav rows, "Princess Sofia" title, Poppins body text.
+ * Old design tokens, kept until every component is migrated.
  */
 @theme {
   --color-blue: #cadefc;
@@ -64,91 +120,9 @@
   body {
     display: flex;
     flex-direction: column;
-    background-color: var(--color-mint);
-    font-family: var(--font-sans);
-  }
-}
-
-@layer components {
-  /* lavender -> slate vertical gradient shared by the nav rows and accordion bars */
-  .curly-gradient {
-    background: linear-gradient(to bottom, #c3bef0 0%, #4b4d51 100%);
-  }
-
-  /* rainbow hover used on .button / .addFriend in the old CSS */
-  .curly-rainbow-hover:hover:enabled {
-    background-image: linear-gradient(
-      to right,
-      #e7484f,
-      #f68b1d,
-      #fced00,
-      #009e4f,
-      #00aac3,
-      #732982
-    );
-    animation: var(--animate-slidebg);
-  }
-}
-
-@theme {
-  --color-blue: #cadefc;
-  --color-mint: #defcf9;
-  --color-grape: #cca8e9;
-  --color-lavender: #c3bef0;
-  --color-slate-gray: #4b4d51;
-  --color-indigo-bright: #7568f1;
-  --color-pink-soft: #fab2b3;
-  --color-accent: #ab60ba;
-  --color-accent-disabled: #bfaab3;
-
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
-  --font-title: var(--font-princess), var(--font-poppins), cursive;
-  --font-nunito: var(--font-nunito), var(--font-poppins), sans-serif;
-
-  --animate-slide-open: slide-open 0.7s forwards;
-  --animate-slide-close: slide-close 0.7s forwards;
-  --animate-slidebg: slidebg 2s linear;
-
-  --shadow-uploader: 11px 10px 24px -6px rgba(148, 44, 148, 1);
-  --shadow-glow: 0 0 10px #504bff, 0 0 20px #504bff, 0 0 30px #504bff;
-  --shadow-sidebar: 6px 2px 5px 0px rgba(0, 0, 0, 0.75);
-  --shadow-row: 11px 13px 13px -12px rgba(122, 115, 122, 0.35);
-}
-
-@keyframes slide-open {
-  to {
-    left: 0;
-  }
-}
-
-@keyframes slide-close {
-  1% {
-    left: 0;
-  }
-  50% {
-    left: -50%;
-  }
-  100% {
-    left: -100%;
-  }
-}
-
-@keyframes slidebg {
-  to {
-    background-position: 20vw;
-  }
-}
-
-@layer base {
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--color-mint);
-    font-family: var(--font-sans);
+    background-color: var(--gc-bg);
+    color: var(--gc-ink);
+    font-family: var(--font-body);
   }
 }
 

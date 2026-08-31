@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useResult } from "@/components/ResultContext";
-import ResultView from "@/components/ResultView";
+import { ResultView } from "@/components/ResultView";
 import type { Ingredient, UploadResponse } from "@/types";
 
-export default function Uploader() {
+export const Uploader = () => {
   const { setOutcome } = useResult();
 
   const [file, setFile] = useState<File | null>(null);
@@ -15,7 +15,7 @@ export default function Uploader() {
   const [showUploader, setShowUploader] = useState(true);
 
   const [myResults, setMyResults] = useState<Ingredient[][] | null>(null);
-  const [myResultsEmpy, setMyResultsEmpy] = useState(false);
+  const [myResultsEmpty, setMyResultsEmpty] = useState(false);
   const [noConnectioError, setNoConnectioError] = useState(false);
 
   function fileSelectedHandler(e: React.ChangeEvent<HTMLInputElement>) {
@@ -39,7 +39,10 @@ export default function Uploader() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
       const body = (await res.json()) as UploadResponse;
 
       if ("success" in body && body.success === false) {
@@ -50,7 +53,8 @@ export default function Uploader() {
         return;
       }
 
-      const goodRes = "data" in body && Array.isArray(body.data) ? body.data[0] : [];
+      const goodRes =
+        "data" in body && Array.isArray(body.data) ? body.data[0] : [];
       const goodResArray = Array.from(goodRes ?? []);
 
       if (goodResArray.length !== 0) {
@@ -60,15 +64,19 @@ export default function Uploader() {
         const otherDrying: Ingredient[] = [];
 
         for (let i = 0; i < goodResArray.length; i++) {
-          if (goodResArray[i].type === "sulfates") sulfates.push(goodResArray[i]);
-          if (goodResArray[i].type === "silicones") silicones.push(goodResArray[i]);
-          if (goodResArray[i].type === "alcohols") alcohols.push(goodResArray[i]);
-          if (goodResArray[i].type === "other drying agents") otherDrying.push(goodResArray[i]);
+          if (goodResArray[i].type === "sulfates")
+            sulfates.push(goodResArray[i]);
+          if (goodResArray[i].type === "silicones")
+            silicones.push(goodResArray[i]);
+          if (goodResArray[i].type === "alcohols")
+            alcohols.push(goodResArray[i]);
+          if (goodResArray[i].type === "other drying agents")
+            otherDrying.push(goodResArray[i]);
         }
 
         const dedupe = (arr: Ingredient[]): Ingredient[] =>
           Array.from(new Set(arr.map((x) => JSON.stringify(x)))).map(
-            (x) => JSON.parse(x) as Ingredient
+            (x) => JSON.parse(x) as Ingredient,
           );
 
         const groups = [
@@ -83,7 +91,7 @@ export default function Uploader() {
         setShowUploader(false);
         setOutcome({ status: "stop", groups });
       } else {
-        setMyResultsEmpy(true);
+        setMyResultsEmpty(true);
         setWaiting(false);
         setShowUploader(false);
         setOutcome({ status: "cool" });
@@ -95,60 +103,87 @@ export default function Uploader() {
   }
 
   return (
-    <div className="flex flex-col justify-center">
-      <div className="flex h-full w-full flex-col justify-center pt-10">
-        {showUploader && (
-          <div className="flex flex-col items-center self-center">
-            <p className="w-[70%] font-sans text-[30px] font-bold">
-              Hi. This website is designed to make your life easier. It&apos;s simple: click
-              the frame, snap an image of a product&apos;s lable, and hit the &quot;Get
-              Results&quot; button. In a few seconds you will know if this product is
-              compatible with CG or not.
+    <div className="mx-auto w-full max-w-md px-5 pb-5">
+      {showUploader && (
+        <div className="flex flex-col">
+          <label
+            htmlFor="uploader"
+            className="relative flex h-75 cursor-pointer items-center justify-center overflow-hidden rounded-3xl bg-linear-160 from-[#26332f] to-[#0c1513]"
+          >
+            <input
+              id="uploader"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              name="file"
+              onChange={fileSelectedHandler}
+              className="hidden"
+            />
+
+            {imagePreviewUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={imagePreviewUrl}
+                alt="preview"
+                className="max-h-full max-w-full object-contain"
+              />
+            ) : null}
+
+            <span className="pointer-events-none absolute left-6 top-18 h-9 w-9 rounded-md border-2 border-b-0 border-r-0 border-gold" />
+            <span className="pointer-events-none absolute right-6 top-18 h-9 w-9 rounded-md border-2 border-b-0 border-l-0 border-gold" />
+            <span className="pointer-events-none absolute bottom-18 left-6 h-9 w-9 rounded-md border-2 border-r-0 border-t-0 border-gold" />
+            <span className="pointer-events-none absolute bottom-18 right-6 h-9 w-9 rounded-md border-2 border-l-0 border-t-0 border-gold" />
+
+            <p className="pointer-events-none absolute inset-x-5 bottom-4 text-center text-xs text-[#e7efea]/85">
+              Hold steady over the ingredients list
             </p>
+          </label>
+
+          <div className="mt-4 flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={uploadImage}
+              disabled={!file || waiting}
+              className="w-full rounded-full bg-brand py-3.5 text-center text-[15px] font-bold text-bg disabled:opacity-45"
+            >
+              Scan ingredients
+            </button>
 
             <label
               htmlFor="uploader"
-              className="flex h-137.5 w-[70%] cursor-pointer flex-col items-center justify-between bg-grape p-2 font-sans text-[50px] font-bold text-black shadow-uploader"
+              className="w-full cursor-pointer rounded-full border border-line py-3.5 text-center text-[15px] font-medium text-ink"
             >
-              Enter your files
-              <input
-                id="uploader"
-                type="file"
-                accept="image/*"
-                name="file"
-                onChange={fileSelectedHandler}
-                className="hidden"
-              />
-              {imagePreviewUrl && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={imagePreviewUrl} alt="preview" className="max-h-[60%] max-w-[60%]" />
-              )}
-              <button
-                type="button"
-                onClick={uploadImage}
-                className="h-[20%] w-[35%] rounded-[10px] border-2 border-black bg-mint font-sans text-[40px] text-black"
-              >
-                Get results
-              </button>
+              Choose a photo
             </label>
           </div>
-        )}
 
-        {myResults && <ResultView outcome={{ status: "stop", groups: myResults }} />}
-        {myResultsEmpy && <ResultView outcome={{ status: "cool" }} />}
-        {noConnectioError && <ResultView outcome={{ status: "error" }} />}
+          {/* Placeholder: no scan history is stored yet. */}
+          <section className="mt-6 border-t border-line pt-3">
+            <h3 className="mb-2 text-xs text-muted">Scanned this week</h3>
+            <p className="py-2 text-[13px] text-muted">
+              Nothing yet. Your scans will show up here once accounts are live.
+            </p>
+          </section>
+        </div>
+      )}
 
-        {waiting && (
-          <Image
-            src="/minifindstore_spin.gif"
-            alt="loading"
-            width={150}
-            height={150}
-            unoptimized
-            className="w-37.5 self-center pt-7.5"
-          />
-        )}
-      </div>
+      {myResults && (
+        <ResultView outcome={{ status: "stop", groups: myResults }} />
+      )}
+      {myResultsEmpty && <ResultView outcome={{ status: "cool" }} />}
+      {noConnectioError && <ResultView outcome={{ status: "error" }} />}
+
+      {waiting && (
+        <Image
+          src="/minifindstore_spin.gif"
+          alt="loading"
+          width={150}
+          height={150}
+          unoptimized
+          className="mx-auto w-24 pt-8"
+          priority
+        />
+      )}
     </div>
   );
-}
+};
