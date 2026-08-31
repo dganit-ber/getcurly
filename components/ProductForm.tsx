@@ -7,8 +7,8 @@ import { BrandField } from "@/components/BrandField";
 export const ProductForm = () => {
   const [values, setValues] = useState<{
     productName?: string;
-    brandname?: string;
-    producttype?: string;
+    brandName?: string;
+    productType?: string;
     fitsSystem?: string;
   }>({});
   const [error, setError] = useState(false);
@@ -28,8 +28,8 @@ export const ProductForm = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         productName: values.productName,
-        brandname: values.brandname,
-        producttype: values.producttype,
+        brandname: values.brandName,
+        productType: values.productType,
         fitsSystem: values.fitsSystem,
       }),
     });
@@ -76,24 +76,24 @@ export const ProductForm = () => {
         />
 
         <BrandField
-          value={values.brandname ?? ""}
+          value={values.brandName ?? ""}
           onChange={(brandname) =>
-            setValues((prev) => ({ ...prev, brandname }))
+            setValues((prev) => ({ ...prev, brandName: brandname }))
           }
           error={
-            values.brandname === undefined && error
+            values.brandName === undefined && error
               ? "Please fill in the brand name."
               : undefined
           }
         />
 
         <TextField
-          name="producttype"
+          name="productType"
           label="Product type"
-          value={values.producttype ?? ""}
+          value={values.productType ?? ""}
           onChange={handleChange}
           error={
-            values.producttype === undefined && error
+            values.productType === undefined && error
               ? "Please fill in the product type."
               : undefined
           }

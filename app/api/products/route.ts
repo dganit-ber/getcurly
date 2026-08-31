@@ -21,14 +21,14 @@ export async function GET() {
   }
 }
 
-// Was: POST /addproduct -> addProduct(productName, brandname, producttype, fitsSystem)
+// Was: POST /addproduct -> addProduct(productName, brandname, productType, fitsSystem)
 // The old client sent `fitsSystem` as the value stored in the `cg_approved` column.
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const name = body.productName;
     const brand = body.brandname;
-    const type = body.producttype;
+    const type = body.productType;
     const cg_approved = body.fitsSystem ?? null;
 
     if (!name || !brand || !type) {

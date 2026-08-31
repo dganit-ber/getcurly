@@ -11,4 +11,3 @@ const karla = Karla({
 });
 
 export const fontVariables = [fraunces.variable, karla.variable].join(" ");
-git
