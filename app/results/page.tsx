@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useResult } from "@/components/ResultContext";
 import { ResultView } from "@/components/ResultView";
+import { useResult } from "../contexts/ResultContext";
 
 export default function ResultsPage() {
   const { outcome } = useResult();

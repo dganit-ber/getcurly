@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useResult } from "@/components/ResultContext";
 import { ResultView } from "@/components/ResultView";
 import type { Ingredient, UploadResponse } from "@/types";
+import { useResult } from "@/app/contexts/ResultContext";
 
 export const Uploader = () => {
   const { setOutcome } = useResult();

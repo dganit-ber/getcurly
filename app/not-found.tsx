@@ -2,9 +2,11 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col items-center gap-4 p-10 text-center">
-      <h1 className="font-title text-[50px]">Page not found</h1>
-      <Link href="/" className="font-sans text-[20px] underline">
+    <div className="mx-auto w-full max-w-md px-5 py-8">
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        Page not found
+      </h1>
+      <Link href="/" className="mt-3 inline-block text-sm font-bold text-brand">
         Back to Get Curly
       </Link>
     </div>

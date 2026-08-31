@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ── New design tokens ──────────────────────────────────────── */
+/* ── Design tokens ──────────────────────────────────────────── */
 :root {
   --gc-bg: #e9efeb;
   --gc-surface: #ffffff;
@@ -60,50 +60,17 @@
   --font-body: var(--font-karla), system-ui, sans-serif;
 }
 
-/*
- * Old design tokens, kept until every component is migrated.
- */
 @theme {
-  --color-blue: #cadefc;
-  --color-mint: #defcf9;
-  --color-grape: #cca8e9;
-  --color-lavender: #c3bef0;
-  --color-slate-gray: #4b4d51;
-  --color-indigo-bright: #7568f1;
-  --color-pink-soft: #fab2b3;
-  --color-accent: #ab60ba;
-  --color-accent-disabled: #bfaab3;
-
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
-  --font-title: var(--font-princess), var(--font-poppins), cursive;
-  --font-nunito: var(--font-nunito), var(--font-poppins), sans-serif;
-
   --animate-slide-open: slide-open 0.7s forwards;
   --animate-slide-close: slide-close 0.7s forwards;
-  --animate-slidebg: slidebg 2s linear;
 
-  --shadow-uploader: 11px 10px 24px -6px rgba(148, 44, 148, 1);
-  --shadow-glow: 0 0 10px #504bff, 0 0 20px #504bff, 0 0 30px #504bff;
   --shadow-sidebar: 6px 2px 5px 0px rgba(0, 0, 0, 0.75);
-  --shadow-row: 11px 13px 13px -12px rgba(122, 115, 122, 0.35);
 }
 
+/* ── Keyframes ──────────────────────────────────────────────── */
 @keyframes slide-open {
   to {
     left: 0;
-  }
-}
-
-@keyframes coil-draw {
-  0% {
-    stroke-dashoffset: 120;
-  }
-  60%,
-  85% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: 120;
   }
 }
 
@@ -119,9 +86,16 @@
   }
 }
 
-@keyframes slidebg {
-  to {
-    background-position: 20vw;
+@keyframes coil-draw {
+  0% {
+    stroke-dashoffset: 120;
+  }
+  60%,
+  85% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 120;
   }
 }
 
@@ -152,23 +126,5 @@
       animation: none;
       stroke-dashoffset: 0;
     }
-  }
-  /* lavender -> slate vertical gradient shared by the nav rows and accordion bars */
-  .curly-gradient {
-    background: linear-gradient(to bottom, #c3bef0 0%, #4b4d51 100%);
-  }
-
-  /* rainbow hover used on .button / .addFriend in the old CSS */
-  .curly-rainbow-hover:hover:enabled {
-    background-image: linear-gradient(
-      to right,
-      #e7484f,
-      #f68b1d,
-      #fced00,
-      #009e4f,
-      #00aac3,
-      #732982
-    );
-    animation: var(--animate-slidebg);
   }
 }

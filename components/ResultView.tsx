@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { OcrOutcome } from "@/components/ResultContext";
 import { AccordionSection } from "@/components/AccordionSection";
 import { Coil } from "@/components/Coil";
+import { OcrOutcome } from "@/app/contexts/ResultContext";
 
 const GrowLine = () => (
   <p className="mt-6 text-center text-[13px] text-muted">
