@@ -1,10 +1,95 @@
 @import "tailwindcss";
 
+@import "tailwindcss";
+
 /*
  * Design tokens ported from the old public/style.css so the look is unchanged:
  * mint background, blue top bar / sidebar, purple uploader panel, lavender->slate
  * gradient nav rows, "Princess Sofia" title, Poppins body text.
  */
+@theme {
+  --color-blue: #cadefc;
+  --color-mint: #defcf9;
+  --color-grape: #cca8e9;
+  --color-lavender: #c3bef0;
+  --color-slate-gray: #4b4d51;
+  --color-indigo-bright: #7568f1;
+  --color-pink-soft: #fab2b3;
+  --color-accent: #ab60ba;
+  --color-accent-disabled: #bfaab3;
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-title: var(--font-princess), var(--font-poppins), cursive;
+  --font-nunito: var(--font-nunito), var(--font-poppins), sans-serif;
+
+  --animate-slide-open: slide-open 0.7s forwards;
+  --animate-slide-close: slide-close 0.7s forwards;
+  --animate-slidebg: slidebg 2s linear;
+
+  --shadow-uploader: 11px 10px 24px -6px rgba(148, 44, 148, 1);
+  --shadow-glow: 0 0 10px #504bff, 0 0 20px #504bff, 0 0 30px #504bff;
+  --shadow-sidebar: 6px 2px 5px 0px rgba(0, 0, 0, 0.75);
+  --shadow-row: 11px 13px 13px -12px rgba(122, 115, 122, 0.35);
+}
+
+@keyframes slide-open {
+  to {
+    left: 0;
+  }
+}
+
+@keyframes slide-close {
+  1% {
+    left: 0;
+  }
+  50% {
+    left: -50%;
+  }
+  100% {
+    left: -100%;
+  }
+}
+
+@keyframes slidebg {
+  to {
+    background-position: 20vw;
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-mint);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  /* lavender -> slate vertical gradient shared by the nav rows and accordion bars */
+  .curly-gradient {
+    background: linear-gradient(to bottom, #c3bef0 0%, #4b4d51 100%);
+  }
+
+  /* rainbow hover used on .button / .addFriend in the old CSS */
+  .curly-rainbow-hover:hover:enabled {
+    background-image: linear-gradient(
+      to right,
+      #e7484f,
+      #f68b1d,
+      #fced00,
+      #009e4f,
+      #00aac3,
+      #732982
+    );
+    animation: var(--animate-slidebg);
+  }
+}
+
 @theme {
   --color-blue: #cadefc;
   --color-mint: #defcf9;
