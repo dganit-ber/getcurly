@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { fontVariables } from "@/lib/fonts";
 import { Header } from "@/components/Header";
-import { ResultProvider } from "./contexts/ResultContext";
+import { ResultProvider } from "./api/context/ResultContext";
 
 export const metadata: Metadata = {
   title: "Get Curly",

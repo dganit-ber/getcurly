@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { freshnessOf } from "@/lib/freshness";
+import Link from "next/link";
 
 export const Search = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -62,41 +63,61 @@ export const Search = () => {
         <p className="mt-6 text-[13px] text-muted">Nothing found.</p>
       ) : (
         <ul className="mt-5 flex flex-col gap-2.5">
-          {products.map((product) => (
-            <li
-              key={product.id}
-              className="rounded-2xl border border-line bg-surface p-3.5"
-            >
-              <div className="flex items-start justify-between gap-2.5">
-                <div>
-                  <p className="font-display text-base font-semibold tracking-tight">
-                    {product.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted">
-                    {product.brand} · {product.type}
-                  </p>
+          {products.map((product) => {
+            const clear = product.cg_approved === "true";
+            const confirmed = freshnessOf(product.verified_at) === "fresh";
+
+            // Hue always carries the verdict — green for Clear, red for Skip.
+            // Freshness changes weight only: a confirmed verdict is solid, an
+            // unverified one is the same colour tinted back, so the two never
+            // collapse into the same grey.
+            const chip = clear
+              ? confirmed
+                ? "bg-ok text-bg"
+                : "bg-ok-bg text-ok"
+              : confirmed
+                ? "bg-bad text-bg"
+                : "bg-bad-bg text-bad";
+
+            return (
+              <li
+                key={product.id}
+                className="rounded-2xl border border-line bg-surface p-3.5"
+              >
+                <div className="flex items-start justify-between gap-2.5">
+                  <div>
+                    <p className="font-display text-base font-semibold tracking-tight">
+                      {product.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted">
+                      {product.brand} · {product.type}
+                    </p>
+                  </div>
+
+                  {product.cg_approved && (
+                    <span
+                      className={`shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${chip}`}
+                    >
+                      {clear ? "Clear" : "Skip"}
+                    </span>
+                  )}
                 </div>
 
-                {product.cg_approved && (
-                  <span
-                    className={`shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${
-                      freshnessOf(product.verified_at) !== "fresh"
-                        ? "border border-line text-muted"
-                        : product.cg_approved === "true"
-                          ? "bg-ok text-bg"
-                          : "bg-bad text-bg"
-                    }`}
-                  >
-                    {product.cg_approved === "true" ? "Clear" : "Skip"}
-                  </span>
-                )}
-              </div>
+                <div className="mt-2 flex items-center justify-between gap-2.5 border-t border-line pt-2">
+                  <FreshnessBadge verifiedAt={product.verified_at} />
 
-              <div className="mt-2 border-t border-line pt-2">
-                <FreshnessBadge verifiedAt={product.verified_at} />
-              </div>
-            </li>
-          ))}
+                  <Link
+                    href={`/?rescan=${product.id}&name=${encodeURIComponent(
+                      product.name,
+                    )}`}
+                    className="shrink-0 text-[13px] font-bold text-brand"
+                  >
+                    Scan this
+                  </Link>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

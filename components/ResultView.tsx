@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AccordionSection } from "@/components/AccordionSection";
 import { Coil } from "@/components/Coil";
-import { OcrOutcome } from "@/app/contexts/ResultContext";
+import { OcrOutcome } from "@/app/api/context/ResultContext";
 
 const GrowLine = () => (
   <p className="mt-6 text-center text-[13px] text-muted">
@@ -57,7 +57,7 @@ export const ResultView = ({
       <div className="mx-auto w-full max-w-md px-5 py-8">
         <Verdict
           tone="stroke-ok"
-          heading="Nothing flagged"
+          heading="Clear"
           blurb="None of the ingredients we read are on the avoid list."
         />
         <GrowLine />
@@ -70,10 +70,15 @@ export const ResultView = ({
 
   return (
     <div className="mx-auto w-full max-w-md px-5 py-8">
+      {/* Heading carries the verdict, in the same words the search badges use.
+          The count belongs in the blurb — "3 to avoid" reads as a quantity
+          where the user is looking for an answer. */}
       <Verdict
         tone="stroke-bad"
-        heading={`${total} to avoid`}
-        blurb="This product isn't compatible with the Curly Girl method."
+        heading="Skip this one"
+        blurb={`We read ${total} ingredient${
+          total === 1 ? "" : "s"
+        } that aren't compatible with the Curly Girl method.`}
       />
 
       <div className="mt-3 border-t border-line">

@@ -3,17 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { useResult } from "@/app/api/context/ResultContext";
 
 const links = [
   { href: "/", label: "Upload an Image" },
   { href: "/profile", label: "Profile" },
   { href: "/products", label: "Products" },
-  { href: "/search", label: "Search Products" },
   { href: "/useful", label: "Useful Information" },
   { href: "/aboutme", label: "Who am I" },
 ];
 
 export const Header = () => {
+  const { reset } = useResult();
+
   // null = untouched (sits off-screen, no animation), true = open, false = closing
   const [open, setOpen] = useState<boolean | null>(null);
 
@@ -28,6 +30,7 @@ export const Header = () => {
     <header className="flex w-full items-center gap-2.5 px-5 pb-3 pt-2.5">
       <Link
         href="/"
+        onClick={reset}
         className="font-display text-xl font-semibold tracking-tight text-brand no-underline"
       >
         get curly
@@ -63,6 +66,7 @@ export const Header = () => {
             <Link
               key={link.href}
               href={link.href}
+              onClick={link.href === "/" ? reset : undefined}
               className="border-t border-line px-5 py-4 text-sm font-medium text-ink no-underline"
             >
               {link.label}

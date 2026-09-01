@@ -18,6 +18,9 @@ export type OcrOutcome =
 interface ResultContextValue {
   outcome: OcrOutcome;
   setOutcome: (outcome: OcrOutcome) => void;
+  /** Back to a blank scanner. Named rather than setOutcome(null) at each call
+   *  site, because "clear the last scan" is the intent, not "set a value". */
+  reset: () => void;
 }
 
 const ResultCtx = createContext<ResultContextValue | undefined>(undefined);
@@ -50,8 +53,10 @@ export function ResultProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const reset = useCallback(() => setOutcome(null), [setOutcome]);
+
   return (
-    <ResultCtx.Provider value={{ outcome, setOutcome }}>
+    <ResultCtx.Provider value={{ outcome, setOutcome, reset }}>
       {children}
     </ResultCtx.Provider>
   );

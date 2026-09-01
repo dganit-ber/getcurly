@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getVisionClient } from "@/lib/vision";
 import { matchIngredients } from "@/lib/matchIngredients";
 import { ingredients } from "@/lib/ingredients";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { UploadResponse } from "@/types";
 import { rateLimit, clientKey } from "@/lib/rateLimit";
 
@@ -24,6 +25,30 @@ const fail = (err: string): Extract<UploadResponse, { success: false }> => ({
   err,
   data: "no results",
 });
+
+/**
+ * Log the scan as evidence about a product. Deliberately not an update to the
+ * products row — a scan is what one person's bottle said, and it only becomes
+ * the stored verdict when promoted. Failure here must not break the scan the
+ * user asked for, so it's logged and swallowed.
+ */
+const logScan = async (
+  productId: number,
+  text: string,
+  cgApproved: string,
+): Promise<void> => {
+  try {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase.from("scans").insert({
+      product_id: productId,
+      ingredients_text: text,
+      cg_approved: cgApproved,
+    });
+    if (error) throw error;
+  } catch (err) {
+    console.error("could not log scan:", err);
+  }
+};
 
 export async function POST(req: Request) {
   try {
@@ -53,6 +78,12 @@ export async function POST(req: Request) {
       return NextResponse.json(fail("unsupported file type"), { status: 415 });
     }
 
+    // Set when the user arrived from a product card. Anything unparseable is
+    // treated as a plain scan rather than an error.
+    const rawId = form.get("productId");
+    const productId =
+      typeof rawId === "string" && /^\d+$/.test(rawId) ? Number(rawId) : null;
+
     // OCR the uploaded image bytes directly - no storage involved.
     const bytes = Buffer.from(await file.arrayBuffer());
     const [result] = await getVisionClient().textDetection({
@@ -62,6 +93,15 @@ export async function POST(req: Request) {
 
     // Match detected text against the "bad ingredient" list (verbatim logic).
     const matched = matchIngredients(textAnnotations, ingredients);
+
+    const fullText = textAnnotations[0]?.description ?? "";
+    if (productId !== null && fullText) {
+      await logScan(
+        productId,
+        fullText,
+        matched.length === 0 ? "true" : "false",
+      );
+    }
 
     return NextResponse.json({ data: [matched] } satisfies UploadResponse);
   } catch (err) {

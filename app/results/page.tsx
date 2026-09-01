@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ResultView } from "@/components/ResultView";
-import { useResult } from "../contexts/ResultContext";
+import { useResult } from "../api/context/ResultContext";
 
 export default function ResultsPage() {
   const { outcome } = useResult();

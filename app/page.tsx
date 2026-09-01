@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import { Uploader } from "@/components/Uploader";
 
 export default function HomePage() {
-  return <Uploader />;
+  return (
+    <Suspense>
+      <Uploader />
+    </Suspense>
+  );
 }

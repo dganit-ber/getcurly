@@ -4,14 +4,18 @@ import type { Product } from "@/types";
 
 export const runtime = "nodejs";
 
-// Was: GET /getLastProducts.json -> getLastProducts() ("SELECT * FROM products ORDER BY id desc")
+// Browse list: only products that pass the method, verified ones first, capped.
+// Someone landing on /search wants usable options, not the whole table. Search
+// still covers everything, so a "Skip" product is findable by name.
 export async function GET() {
   try {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("id", { ascending: false });
+      .eq("cg_approved", "true")
+      .order("verified_at", { ascending: false, nullsFirst: false })
+      .limit(50);
 
     if (error) throw error;
     return NextResponse.json((data ?? []) as Product[]);
@@ -21,7 +25,7 @@ export async function GET() {
   }
 }
 
-// Was: POST /addproduct -> addProduct(productName, brandname, productType, fitsSystem)
+// Was: POST /addproduct -> addProduct(productName, brandname, producttype, fitsSystem)
 // The old client sent `fitsSystem` as the value stored in the `cg_approved` column.
 export async function POST(req: Request) {
   try {
@@ -38,7 +42,7 @@ export async function POST(req: Request) {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("products")
-      .insert({ name, brand, type, cg_approved })
+      .insert({ name, brand, type, cg_approved, source: "manual" })
       .select("name")
       .single();
 
