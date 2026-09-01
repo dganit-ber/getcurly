@@ -58,35 +58,21 @@ export const Uploader = () => {
       const goodResArray = Array.from(goodRes ?? []);
 
       if (goodResArray.length !== 0) {
-        const sulfates: Ingredient[] = [];
-        const silicones: Ingredient[] = [];
-        const alcohols: Ingredient[] = [];
-        const otherDrying: Ingredient[] = [];
+        // Group by type, deduped, in the order types first appear in the list.
+        const byType = new Map<string, Map<string, Ingredient>>();
 
-        for (let i = 0; i < goodResArray.length; i++) {
-          if (goodResArray[i].type === "sulfates")
-            sulfates.push(goodResArray[i]);
-          if (goodResArray[i].type === "silicones")
-            silicones.push(goodResArray[i]);
-          if (goodResArray[i].type === "alcohols")
-            alcohols.push(goodResArray[i]);
-          if (goodResArray[i].type === "other drying agents")
-            otherDrying.push(goodResArray[i]);
+        for (const found of goodResArray) {
+          const group = byType.get(found.type) ?? new Map<string, Ingredient>();
+          group.set(found.name, found);
+          byType.set(found.type, group);
         }
 
-        const dedupe = (arr: Ingredient[]): Ingredient[] =>
-          Array.from(new Set(arr.map((x) => JSON.stringify(x)))).map(
-            (x) => JSON.parse(x) as Ingredient,
-          );
-
-        const groups = [
-          dedupe(sulfates),
-          dedupe(silicones),
-          dedupe(alcohols),
-          dedupe(otherDrying),
-        ];
+        const groups = Array.from(byType.values(), (group) =>
+          Array.from(group.values()),
+        );
 
         setMyResults(groups);
+
         setWaiting(false);
         setShowUploader(false);
         setOutcome({ status: "stop", groups });

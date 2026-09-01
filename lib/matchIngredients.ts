@@ -6,40 +6,39 @@ export interface TextAnnotation {
 }
 
 /**
- * Ported verbatim from the old Express `/upload` handler (index.js). Given the
- * `textAnnotations` array returned by Google Vision `textDetection`, return the
- * list of "bad" ingredients (from `ingredientList`) that appear on the label.
+ * Collapse the spelling differences that appear on real labels so the list
+ * only needs one entry per ingredient:
+ *   - British "sulphate"/"sulphonate" -> American "sulfate"/"sulfonate"
+ *   - punctuation, hyphens and spaces removed, so "sodium coco-sulfate",
+ *     "sodium coco sulfate" and "alcohol denat." all normalise alike
+ */
+const normalize = (s: string): string =>
+  s
+    .toLowerCase()
+    .replace(/sulph/g, "sulf")
+    .replace(/[^a-z0-9]/g, "");
+
+/**
+ * Given the `textAnnotations` array returned by Google Vision `textDetection`,
+ * return the "bad" ingredients from `ingredientList` that appear on the label.
  *
- * The first annotation holds the full detected text block; it is lowercased,
- * split on newlines/commas, trimmed, and each known ingredient name is checked
- * for an exact match against those tokens.
+ * The first annotation holds the full detected text block. It is split on
+ * newlines and commas, each token normalised, and compared against every known
+ * ingredient's name and aliases.
  */
 export function matchIngredients(
   textAnnotations: TextAnnotation[],
-  ingredientList: Ingredient[]
+  ingredientList: Ingredient[],
 ): Ingredient[] {
-  const finalRes: Ingredient[] = [];
-
-  const ingredientsFromAPI: string[] = [];
-  for (let i = 0; i < textAnnotations.length; i++) {
-    ingredientsFromAPI.push((textAnnotations[i].description ?? "").toLowerCase());
-  }
-
-  if (!ingredientsFromAPI[0]) {
-    return finalRes;
-  }
+  const fullText = textAnnotations[0]?.description ?? "";
+  if (!fullText) return [];
 
   // Regex that removes line breaks. Superimportant, do not delete.
-  const ingredientsArr = ingredientsFromAPI[0].split(/[\n,]+/);
-  for (let z = 0; z < ingredientsArr.length; z++) {
-    ingredientsArr[z] = ingredientsArr[z].trim();
-  }
+  const tokens = new Set(fullText.split(/[\n,]+/).map(normalize));
 
-  for (let x = 0; x < ingredientList.length; x++) {
-    if (ingredientsArr.includes(ingredientList[x].name)) {
-      finalRes.push(ingredientList[x]);
-    }
-  }
-
-  return finalRes;
+  return ingredientList.filter(
+    (ingredient) =>
+      tokens.has(normalize(ingredient.name)) ||
+      ingredient.aliases?.some((alias) => tokens.has(normalize(alias))),
+  );
 }
