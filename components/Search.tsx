@@ -6,9 +6,9 @@ import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { VerdictPill } from "@/components/VerdictPill";
 import Link from "next/link";
 
-export const Search = () => {
+export const Search = ({ initialQuery }: { initialQuery?: string }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [query, setQuery] = useState<string>();
+  const [query, setQuery] = useState<string | undefined>(initialQuery);
 
   useEffect(() => {
     let ignore = false;
@@ -54,6 +54,7 @@ export const Search = () => {
 
       <input
         onChange={onProductSearch}
+        defaultValue={initialQuery}
         type="text"
         placeholder="Search a product"
         className="mt-5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
@@ -90,7 +91,7 @@ export const Search = () => {
                   <FreshnessBadge verifiedAt={product.verified_at} />
 
                   <Link
-                    href={`/?rescan=${product.id}&name=${encodeURIComponent(
+                    href={`/scan?rescan=${product.id}&name=${encodeURIComponent(
                       product.name,
                     )}`}
                     className="shrink-0 text-[13px] font-bold text-brand"

@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useResult } from "@/app/api/context/ResultContext";
+import { CurlMark } from "@/components/CurlMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
-  { href: "/", label: "Upload an Image" },
+  { href: "/scan", label: "Scan a label" },
+  { href: "/search", label: "Search products" },
   { href: "/profile", label: "Profile" },
   { href: "/products", label: "Products" },
   { href: "/useful", label: "Useful Information" },
@@ -32,9 +34,12 @@ export const Header = () => {
       <Link
         href="/"
         onClick={reset}
-        className="font-display text-xl font-semibold tracking-tight text-brand no-underline"
+        className="flex items-center gap-1.5 font-display text-[17.5px] font-extrabold tracking-tight text-ink no-underline"
       >
-        get curly
+        <span className="text-accent">
+          <CurlMark />
+        </span>
+        Get <i className="not-italic text-accent">Curly</i>
       </Link>
 
       <span className="flex-1" />

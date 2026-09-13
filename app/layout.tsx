@@ -4,7 +4,6 @@ import { fontVariables } from "@/lib/fonts";
 import { newFontVariables } from "./fonts";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { Header } from "@/components/Header";
-import { WaveDivider } from "@/components/WaveDivider";
 import { ResultProvider } from "./api/context/ResultContext";
 
 export const metadata: Metadata = {
@@ -30,7 +29,6 @@ export default function RootLayout({
         <ResultProvider>
           <div className="flex min-h-screen w-full flex-col items-center">
             <Header />
-            <WaveDivider />
             <div className="flex w-full flex-1 flex-col items-center">
               {children}
             </div>
