@@ -12,6 +12,7 @@
  * Usage:
  *   npx tsx --env-file=.env.local scripts/backfillIngredients.ts
  */
+import { writeFile } from "node:fs/promises";
 import { createClient } from "@supabase/supabase-js";
 import { ingredients } from "@/lib/ingredients";
 import type { IngredientCategory } from "@/lib/db.types";
@@ -112,39 +113,64 @@ const main = async () => {
     .not("ingredients_text", "is", null);
   if (productsError) throw productsError;
 
-  const frequency = new Map<string, number>();
+  // Keyed case-insensitively: match_ingredient lowercases anyway, so counting
+  // "SODIUM CHLORIDE" and "Sodium Chloride" separately would both inflate the
+  // backlog and split one ingredient's frequency across several rows.
+  const frequency = new Map<string, { display: string; count: number }>();
   for (const { ingredients_text } of products ?? []) {
     if (!ingredients_text) continue;
     for (const raw of ingredients_text.split(/[\n,]+/)) {
-      const token = raw.trim();
+      const token = raw.trim().replace(/\s+/g, " ");
       if (!token) continue;
-      frequency.set(token, (frequency.get(token) ?? 0) + 1);
+      const key = token.toLowerCase();
+      const seen = frequency.get(key);
+      if (seen) seen.count += 1;
+      else frequency.set(key, { display: token, count: 1 });
     }
   }
 
-  const tokens = [...frequency.keys()];
+  // Tokens this long are OCR noise or a whole run-on paragraph, not an INCI name.
+  const tokens = [...frequency.values()].filter((t) => t.display.length <= 60);
   const misses: { token: string; count: number }[] = [];
+  let done = 0;
 
   for (const batch of chunked(tokens, CHUNK)) {
     const results = await Promise.all(
-      batch.map((token) =>
-        supabase.rpc("match_ingredient", { p_text: token }).then(({ data, error }) => {
-          if (error) throw error;
-          return { token, matched: (data?.length ?? 0) > 0 };
-        }),
+      batch.map(({ display, count }) =>
+        supabase
+          .rpc("match_ingredient", { p_text: display })
+          .then(({ data, error }) => {
+            if (error) throw error;
+            return { display, count, matched: (data?.length ?? 0) > 0 };
+          }),
       ),
     );
-    for (const { token, matched } of results) {
-      if (!matched) misses.push({ token, count: frequency.get(token)! });
+    for (const { display, count, matched } of results) {
+      if (!matched) misses.push({ token: display, count });
     }
+    done += batch.length;
+    process.stdout.write(`\rchecked ${done}/${tokens.length}`);
   }
 
   misses.sort((a, b) => b.count - a.count);
 
-  console.log(`\n${tokens.length} distinct ingredient-text tokens across products`);
-  console.log(`${misses.length} unmatched — dictionary backlog, most frequent first:\n`);
-  for (const { token, count } of misses) {
-    console.log(`${String(count).padStart(4)}  ${token}`);
+  // The full list is long by nature — the dictionary only holds the avoid-list
+  // today, so every benign ingredient in the library reads as a miss. Write it
+  // out and keep the terminal to a summary.
+  const reportPath = process.argv[2] ?? "ingredient-backlog.txt";
+  await writeFile(
+    reportPath,
+    misses.map(({ token, count }) => `${count}\t${token}`).join("\n"),
+    "utf8",
+  );
+
+  const matched = tokens.length - misses.length;
+  console.log(`\n\n${tokens.length} distinct ingredient tokens across products`);
+  console.log(`${matched} matched, ${misses.length} unmatched`);
+  console.log(`full backlog written to ${reportPath}\n`);
+  console.log("most frequent unmatched:");
+  for (const { token, count } of misses.slice(0, 30)) {
+    console.log(`${String(count).padStart(5)}  ${token}`);
   }
 };
 

@@ -277,6 +277,8 @@ export const copy = {
   },
 
   footer: {
+    independence:
+      "Get Curly is an independent project. It isn't affiliated with, endorsed by, or connected to the Curly Girl Method or its author.",
     links: "About the method · How verification works · Contact",
   },
 

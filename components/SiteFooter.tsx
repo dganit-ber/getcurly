@@ -6,6 +6,9 @@ export const SiteFooter = () => (
     <p className="mb-2 text-[12.5px] text-ink-soft">
       {copy.affiliate.footerPromise}
     </p>
-    <p className="text-xs text-ink-faint">{copy.footer.links}</p>
+    <p className="mb-2 text-[12.5px] text-ink-soft">
+      {copy.footer.independence}
+    </p>
+    {/* <p className="text-xs text-ink-faint">{copy.footer.links}</p> */}
   </footer>
 );

@@ -105,17 +105,6 @@ export default async function HomePage() {
         </Section>
       )}
 
-      <Section>
-        <SectionLabel>{copy.home.readUp}</SectionLabel>
-        {ARTICLES.map((article) => (
-          <ArticleRow
-            key={article.title}
-            kicker={article.kicker}
-            title={article.title}
-          />
-        ))}
-      </Section>
-
       <SiteFooter />
     </div>
   );
