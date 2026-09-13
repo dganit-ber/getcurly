@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
-import { freshnessOf } from "@/lib/freshness";
+import { VerdictPill } from "@/components/VerdictPill";
 import Link from "next/link";
 
 export const Search = () => {
@@ -65,19 +65,6 @@ export const Search = () => {
         <ul className="mt-5 flex flex-col gap-2.5">
           {products.map((product) => {
             const clear = product.cg_approved === "true";
-            const confirmed = freshnessOf(product.verified_at) === "fresh";
-
-            // Hue always carries the verdict — green for Clear, red for Skip.
-            // Freshness changes weight only: a confirmed verdict is solid, an
-            // unverified one is the same colour tinted back, so the two never
-            // collapse into the same grey.
-            const chip = clear
-              ? confirmed
-                ? "bg-ok text-bg"
-                : "bg-ok-bg text-ok"
-              : confirmed
-                ? "bg-bad text-bg"
-                : "bg-bad-bg text-bad";
 
             return (
               <li
@@ -95,11 +82,7 @@ export const Search = () => {
                   </div>
 
                   {product.cg_approved && (
-                    <span
-                      className={`shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${chip}`}
-                    >
-                      {clear ? "Clear" : "Skip"}
-                    </span>
+                    <VerdictPill verdict={clear ? "clear" : "skip"} />
                   )}
                 </div>
 

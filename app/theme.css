@@ -1,0 +1,200 @@
+/* app/theme.css — Tailwind v4
+ *
+ * Imported from app/globals.css, after the existing `--gc-*` token block so
+ * shared names (ink, surface, line) resolve to these new values everywhere,
+ * while old-only names (brand, gold, ok/bad/warn, sunk, shell, muted) keep
+ * working unchanged until the components that use them are rewritten.
+ *
+ * Two layers on purpose:
+ *   1. Raw CSS variables per theme, in :root / media / [data-theme] blocks.
+ *   2. An `@theme inline` block that maps them onto Tailwind's namespaces, so
+ *      `bg-ground`, `text-ink`, `border-line`, `font-display` all work AND swap
+ *      with the theme. `inline` is required — without it Tailwind copies the
+ *      value instead of the var() reference and dark mode stops working.
+ *
+ * Rules:
+ *   - No hex literals in components. Ever.
+ *   - Every colour is defined in the bare :root block first. A colour whose only
+ *     definition lives inside a media or [data-theme] block is the classic
+ *     unreadable-in-one-theme bug.
+ *   - clear / skip / caution are semantic and separate from the accent. Never the
+ *     only signal: always paired with an icon and a word.
+ */
+
+/* ---------- light (the base) ---------- */
+:root {
+  color-scheme: light;
+
+  --ground:      #F8F2F7;  /* page */
+  --surface:     #FFFFFF;  /* cards */
+  --surface-2:   #F1E7EE;  /* insets, fields, chips */
+
+  --ink:         #2E2233;  /* body text — a cool plum-charcoal, not black */
+  --ink-soft:    #6C5C77;
+  --ink-faint:   #9A8AA4;
+  --line:        #E3D6E0;
+
+  --accent:      #B2377F;  /* the one accent. fuchsia — cool side of pink. */
+  --accent-bg:   #FBE3F0;
+  --on-accent:   #FFFFFF;
+
+  --clear:       #0E7267;  /* verdict: Clear */
+  --clear-bg:    #D3EDE8;
+  --skip:        #4B4668;  /* verdict: Skip — slate-indigo, serious not alarming */
+  --skip-bg:     #E5E3F0;
+  --caution:     #3A5691;  /* "manufacturers change ingredients" */
+  --caution-bg:  #E3EAF7;
+
+  --shadow-sm:   0 1px 2px rgb(46 34 51 / 0.05), 0 5px 14px rgb(46 34 51 / 0.07);
+  --shadow:      0 1px 2px rgb(46 34 51 / 0.04), 0 10px 26px rgb(46 34 51 / 0.07);
+
+  /* the section divider: a drawn wave, not a rule */
+  --wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='9' viewBox='0 0 26 9'%3E%3Cpath d='M0 5.5 Q 6.5 1 13 5.5 T 26 5.5' fill='none' stroke='%23EBDFE8' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ---------- dark: system preference, unless she chose light ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --ground:     #1C1622;
+    --surface:    #27202E;
+    --surface-2:  #322A3A;
+
+    --ink:        #F3ECF4;
+    --ink-soft:   #BFAECA;
+    --ink-faint:  #948499;
+    --line:       #3C3346;
+
+    --accent:     #EE86BE;
+    --accent-bg:  #402435;
+    --on-accent:  #2B1222;
+
+    --clear:      #4FD1BC;
+    --clear-bg:   #103331;
+    --skip:       #AFA9DF;
+    --skip-bg:    #2A2740;
+    --caution:    #A7BEEE;
+    --caution-bg: #222B3E;
+
+    --shadow-sm:  0 1px 2px rgb(0 0 0 / 0.3), 0 6px 16px rgb(0 0 0 / 0.3);
+    --shadow:     0 1px 2px rgb(0 0 0 / 0.3), 0 12px 30px rgb(0 0 0 / 0.34);
+
+    --wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='9' viewBox='0 0 26 9'%3E%3Cpath d='M0 5.5 Q 6.5 1 13 5.5 T 26 5.5' fill='none' stroke='%233E3548' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+}
+
+/* ---------- dark: she chose it explicitly ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ground:     #1C1622;
+  --surface:    #27202E;
+  --surface-2:  #322A3A;
+
+  --ink:        #F3ECF4;
+  --ink-soft:   #BFAECA;
+  --ink-faint:  #948499;
+  --line:       #3C3346;
+
+  --accent:     #EE86BE;
+  --accent-bg:  #402435;
+  --on-accent:  #2B1222;
+
+  --clear:      #4FD1BC;
+  --clear-bg:   #103331;
+  --skip:       #AFA9DF;
+  --skip-bg:    #2A2740;
+  --caution:    #A7BEEE;
+  --caution-bg: #222B3E;
+
+  --shadow-sm:  0 1px 2px rgb(0 0 0 / 0.3), 0 6px 16px rgb(0 0 0 / 0.3);
+  --shadow:     0 1px 2px rgb(0 0 0 / 0.3), 0 12px 30px rgb(0 0 0 / 0.34);
+
+  --wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='9' viewBox='0 0 26 9'%3E%3Cpath d='M0 5.5 Q 6.5 1 13 5.5 T 26 5.5' fill='none' stroke='%233E3548' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ---------- the dark: variant, driven by the same two states ---------- */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *, :root:not([data-theme="light"])) {
+      @slot;
+    }
+  }
+  &:where(:root[data-theme="dark"] *, :root[data-theme="dark"]) {
+    @slot;
+  }
+}
+
+/* ---------- map onto Tailwind ---------- */
+@theme inline {
+  --color-ground:     var(--ground);
+  --color-surface:    var(--surface);
+  --color-surface-2:  var(--surface-2);
+
+  --color-ink:        var(--ink);
+  --color-ink-soft:   var(--ink-soft);
+  --color-ink-faint:  var(--ink-faint);
+  --color-line:       var(--line);
+
+  --color-accent:     var(--accent);
+  --color-accent-bg:  var(--accent-bg);
+  --color-on-accent:  var(--on-accent);
+
+  --color-clear:      var(--clear);
+  --color-clear-bg:   var(--clear-bg);
+  --color-skip:       var(--skip);
+  --color-skip-bg:    var(--skip-bg);
+  --color-caution:    var(--caution);
+  --color-caution-bg: var(--caution-bg);
+
+  --font-display: var(--font-gabarito), "Avenir Next", Verdana, sans-serif;
+  --font-sans:    var(--font-hanken), "Helvetica Neue", Arial, sans-serif;
+
+  --shadow-soft:    var(--shadow);
+  --shadow-soft-sm: var(--shadow-sm);
+
+  /* generous, because curls are round. Nothing square. */
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   20px;
+  --radius-xl:   22px;
+  --radius-2xl:  24px;
+}
+
+/* ---------- base ---------- */
+@layer base {
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2.5px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  /* the section divider. Encodes something true (a curl), so it earns its place. */
+  .wave-top {
+    background-image: var(--wave);
+    background-repeat: repeat-x;
+    background-position: top center;
+    background-size: 26px 9px;
+  }
+}

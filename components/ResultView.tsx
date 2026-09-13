@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AccordionSection } from "@/components/AccordionSection";
 import { Coil } from "@/components/Coil";
+import { IngredientRow } from "@/components/IngredientRow";
 import { OcrOutcome } from "@/app/api/context/ResultContext";
 
 const GrowLine = () => (
@@ -86,15 +87,7 @@ export const ResultView = ({
           <AccordionSection key={i} title={group[0].type} count={group.length}>
             <ul>
               {group.map((result, item) => (
-                <li key={item} className="py-2">
-                  <span className="block text-[13px] font-medium capitalize">
-                    {result.name}
-                  </span>
-                  {/* Placeholder: lib/ingredients.ts has no real descriptions yet. */}
-                  <span className="block text-xs leading-relaxed text-muted">
-                    Explanation coming soon.
-                  </span>
-                </li>
+                <IngredientRow key={item} position={item + 1} name={result.name} />
               ))}
             </ul>
           </AccordionSection>

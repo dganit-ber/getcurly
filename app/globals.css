@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* theme.css's tokens win for shared names (ink, surface, line, font-display)
+ * since it comes first and CSS custom properties/`@theme` keys resolve last-
+ * declaration-wins; the --gc-* block below still owns everything it doesn't
+ * collide with (bg, sunk, muted, brand, gold, ok/bad/warn, shell, font-body)
+ * until the components using those migrate too. */
+@import "./theme.css";
+
 /* ── Design tokens ──────────────────────────────────────────── */
 :root {
   --gc-bg: #e9efeb;
@@ -41,11 +48,8 @@
 
 @theme inline {
   --color-bg: var(--gc-bg);
-  --color-surface: var(--gc-surface);
   --color-sunk: var(--gc-sunk);
-  --color-ink: var(--gc-ink);
   --color-muted: var(--gc-muted);
-  --color-line: var(--gc-line);
   --color-brand: var(--gc-brand);
   --color-gold: var(--gc-gold);
   --color-ok: var(--gc-ok);
@@ -56,7 +60,7 @@
   --color-bad-bg: var(--gc-bad-bg);
   --color-shell: var(--gc-shell);
 
-  --font-display: var(--font-fraunces), Georgia, serif;
+  /* surface, ink, line and font-display now come from theme.css */
   --font-body: var(--font-karla), system-ui, sans-serif;
 }
 
@@ -104,12 +108,10 @@
     box-sizing: border-box;
   }
 
+  /* background, color and font-family come from theme.css's own body rule */
   body {
     display: flex;
     flex-direction: column;
-    background-color: var(--gc-bg);
-    color: var(--gc-ink);
-    font-family: var(--font-body);
   }
 }
 

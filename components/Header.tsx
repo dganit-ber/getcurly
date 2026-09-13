@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useResult } from "@/app/api/context/ResultContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
   { href: "/", label: "Upload an Image" },
@@ -37,6 +38,8 @@ export const Header = () => {
       </Link>
 
       <span className="flex-1" />
+
+      <ThemeToggle />
 
       <button
         type="button"
