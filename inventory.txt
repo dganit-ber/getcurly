@@ -1,0 +1,48 @@
+PAGES
+
+/                        111
+/scan                     10
+/search                   10
+/products                  5
+/results                  27
+/profile                   5
+/useful                    5
+/aboutme                   5
+layout                    40
+not-found                 14
+                   ---------
+                         232
+
+
+COMPONENTS
+
+ProductForm              166
+ScanForm                 160
+Search                   109
+BrandField               106
+ResultView               100
+Header                    87
+IngredientRow             59
+Uploader                  47
+AccordionSection          44
+ThemeToggle               37
+ScanCta                   36
+ArticleRow                33
+TextField                 29
+UnderConstruction         26
+FreshnessBadge            24
+StepList                  22
+VerdictPill               22
+SearchRow                 21
+SoftBox                   21
+StatTile                  21
+Coil                      16
+CurlMark                  16
+GroupChip                 16
+SiteFooter                14
+RescanBanner              12
+Section                    9
+SectionLabel               6
+WaveDivider                4
+                   ---------
+                        1263
