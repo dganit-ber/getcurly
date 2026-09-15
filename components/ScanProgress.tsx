@@ -82,14 +82,14 @@ export const ScanProgress = ({
                 )}
               </span>
 
-              <span className={done ? "text-muted" : "text-ink"}>{step}</span>
+              <span className={done ? "text-ink-soft" : "text-ink"}>{step}</span>
             </li>
           );
         })}
       </ul>
 
       {longWait && (
-        <p className="mt-5 text-[13px] text-muted">{copy.scan.reading.stillGoing}</p>
+        <p className="mt-5 text-[14px] text-ink-soft">{copy.scan.reading.stillGoing}</p>
       )}
     </section>
   );

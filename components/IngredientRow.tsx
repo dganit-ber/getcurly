@@ -4,6 +4,8 @@ interface IngredientRowProps {
   position: number;
   name: string;
   category?: string;
+  /** Draws the row as one of the reasons for a Skip. */
+  flagged?: boolean;
   onDelete?: () => void;
   onEdit?: () => void;
 }
@@ -17,18 +19,30 @@ export const IngredientRow = ({
   position,
   name,
   category,
+  flagged = false,
   onDelete,
   onEdit,
 }: IngredientRowProps) => (
-  <li className="flex items-center gap-2.5 py-2">
-    <span className="w-5 shrink-0 text-right text-xs text-muted">
+  <li className="flex items-baseline gap-3 py-2">
+    <span className="w-6 shrink-0 text-right text-[13px] tabular-nums text-ink-faint">
       {position}
     </span>
 
-    <div className="flex-1">
-      <span className="block text-[13px] font-medium capitalize">{name}</span>
+    <div className="flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1">
+      <span
+        className={`text-[15px] capitalize leading-snug ${
+          flagged ? "font-semibold text-skip" : "text-ink"
+        }`}
+      >
+        {name}
+      </span>
+
       {category && (
-        <span className="mt-0.5 inline-block rounded-full bg-sunk px-2 py-0.5 text-[11px] capitalize text-muted">
+        <span
+          className={`rounded-full px-2 py-0.5 text-[12px] capitalize ${
+            flagged ? "bg-skip-bg text-skip" : "bg-surface-2 text-ink-soft"
+          }`}
+        >
           {category}
         </span>
       )}
@@ -39,9 +53,9 @@ export const IngredientRow = ({
         type="button"
         onClick={onEdit}
         aria-label={`Edit ${name}`}
-        className="shrink-0 text-muted"
+        className="shrink-0 text-ink-soft"
       >
-        <Pencil size={14} strokeWidth={1.75} aria-hidden />
+        <Pencil size={16} strokeWidth={1.75} aria-hidden />
       </button>
     )}
 
@@ -50,9 +64,9 @@ export const IngredientRow = ({
         type="button"
         onClick={onDelete}
         aria-label={`Remove ${name}`}
-        className="shrink-0 text-muted"
+        className="shrink-0 text-ink-soft"
       >
-        <Trash2 size={14} strokeWidth={1.75} aria-hidden />
+        <Trash2 size={16} strokeWidth={1.75} aria-hidden />
       </button>
     )}
   </li>

@@ -51,7 +51,7 @@ export const PickCard = ({ scanId, question }: PickCardProps) => {
   };
 
   return (
-    <section className="rounded-2xl border border-line bg-sunk p-4">
+    <section className="rounded-2xl border border-line bg-surface-2 p-4">
       <h2 className="font-display text-[17px] font-semibold tracking-tight text-ink">
         {copy.pick.title}
       </h2>
@@ -79,7 +79,7 @@ export const PickCard = ({ scanId, question }: PickCardProps) => {
           type="button"
           disabled={pending}
           onClick={() => setDismissed(true)}
-          className="w-full py-2 text-[13px] text-muted disabled:opacity-50"
+          className="w-full py-2 text-[14px] text-ink-soft disabled:opacity-50"
         >
           {copy.pick.cantTell}
         </button>

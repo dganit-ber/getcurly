@@ -44,7 +44,7 @@ export const ScanError = ({ reason, count, onRetry }: ScanErrorProps) => {
       <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
         {content.title}
       </h2>
-      <p className="mt-2 text-[14px] leading-relaxed text-muted">{content.body}</p>
+      <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">{content.body}</p>
 
       {searchInstead ? (
         <Link

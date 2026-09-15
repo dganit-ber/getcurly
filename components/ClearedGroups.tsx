@@ -31,18 +31,18 @@ export const ClearedGroups = ({ flagged }: ClearedGroupsProps) => {
 
   if (flagged.length > 0) {
     return (
-      <p className="py-3 text-[13px] text-muted">
+      <p className="py-2 text-[14px] leading-relaxed text-ink-soft">
         {copy.verdict.nothingFlaggedIn} {labels.join(", ")}.
       </p>
     );
   }
 
   return (
-    <ul className="py-2">
+    <ul className="py-1">
       {labels.map((label) => (
         <li key={label} className="flex items-center gap-2 py-1.5">
           <Check size={15} strokeWidth={2} className="text-clear" aria-hidden />
-          <span className="text-[14px] text-ink">{label}</span>
+          <span className="text-[15px] text-ink">{label}</span>
         </li>
       ))}
     </ul>

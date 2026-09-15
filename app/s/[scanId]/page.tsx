@@ -38,7 +38,7 @@ export default async function ScanVerdictPage({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-md px-5 pb-16">
+    <div className="mx-auto w-full max-w-md px-5 pb-14">
       <VerdictBlock verdict={verdict} flaggedCount={reasons.length} />
 
       {/* Rule 3 — the only interruption, and only when it would change the answer. */}
@@ -46,20 +46,20 @@ export default async function ScanVerdictPage({
         <PickCard scanId={scan.id} question={openQuestions[0]} />
       )}
 
-      <section className="border-t border-line py-4">
-        <p className="text-[15px] font-medium text-ink">
+      <section className="border-t border-line py-3">
+        <p className="text-[16px] font-semibold text-ink">
           {productName ? copy.verdict.looksLike(productName) : copy.verdict.unknownProduct}
         </p>
         {!productName && (
-          <p className="mt-0.5 text-[13px] text-muted">
+          <p className="mt-0.5 text-[13px] text-ink-soft">
             {copy.verdict.unknownProductMeta}
           </p>
         )}
       </section>
 
       {verdict === "skip" ? (
-        <section className="border-t border-line py-4">
-          <h2 className="font-display text-[17px] font-semibold tracking-tight text-ink">
+        <section className="border-t border-line py-3">
+          <h2 className="font-display text-[18px] font-semibold tracking-tight text-ink">
             {copy.verdict.whatWeFound}
           </h2>
           <ul className="mt-1">
@@ -75,27 +75,27 @@ export default async function ScanVerdictPage({
           <ClearedGroups flagged={flaggedGroups} />
         </section>
       ) : (
-        <section className="border-t border-line py-4">
+        <section className="border-t border-line py-3">
           <ClearedGroups flagged={[]} />
         </section>
       )}
 
       <div className="border-t border-line">
-        <IngredientList items={counted} href={`/s/${scan.id}/list`} />
+        <IngredientList items={counted} />
       </div>
 
-      <section className="rounded-2xl bg-sunk p-4">
-        <p className="text-[13px] font-medium text-ink">
+      <section className="mt-2 rounded-2xl bg-surface-2 p-4">
+        <p className="text-[14px] font-semibold text-ink">
           {copy.evidence.firstRead}
         </p>
-        <p className="mt-1 text-[13px] leading-relaxed text-muted">
+        <p className="mt-1 text-[14px] leading-relaxed text-ink-soft">
           {copy.evidence.firstReadBody}
         </p>
       </section>
 
       <Link
         href="/scan"
-        className="mt-6 block w-full rounded-full border border-line py-3.5 text-center text-[15px] font-medium text-ink"
+        className="mt-5 block w-full rounded-full border border-line py-3.5 text-center text-[16px] font-semibold text-ink"
       >
         {copy.verdict.scanAnother}
       </Link>

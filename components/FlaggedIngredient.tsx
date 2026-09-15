@@ -19,12 +19,14 @@ export const FlaggedIngredient = ({
   name,
   category,
 }: FlaggedIngredientProps) => (
-  <li className="border-b border-line py-3.5 last:border-0">
-    <p className="text-[15px] font-medium capitalize text-ink">{name}</p>
-    <p className="mt-0.5 text-[13px] text-muted">
+  <li className="border-b border-line py-3 last:border-0">
+    <p className="text-[16px] font-semibold capitalize leading-snug text-ink">
+      {name}
+    </p>
+    <p className="mt-0.5 text-[13px] text-ink-soft">
       {copy.groups[category]} · #{position} on the label
     </p>
-    <p className="mt-1.5 text-[13px] leading-relaxed text-ink">
+    <p className="mt-1.5 text-[14px] leading-relaxed text-ink">
       {copy.why[category]}
     </p>
   </li>

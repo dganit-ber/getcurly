@@ -82,7 +82,7 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
     <div className="flex flex-col py-4">
       <label
         htmlFor="label-photo"
-        className="relative flex h-72 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-line bg-sunk"
+        className="relative flex h-72 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-line bg-surface-2"
       >
         <input
           id="label-photo"
@@ -101,7 +101,7 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
             className="max-h-full max-w-full object-contain"
           />
         ) : (
-          <p className="px-8 text-center text-[13px] leading-relaxed text-muted">
+          <p className="px-8 text-center text-[14px] leading-relaxed text-ink-soft">
             {copy.scan.labelHint}
           </p>
         )}
@@ -114,12 +114,12 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
         {copy.scan.takePhoto}
       </label>
 
-      <p className="mt-3 text-center text-[12px] text-muted">
+      <p className="mt-3 text-center text-[14px] text-ink-soft">
         {copy.scan.fileLimits}
       </p>
 
       {/* Rule 4: reassurance, not a warning. */}
-      <p className="mt-4 text-[13px] leading-relaxed text-muted">
+      <p className="mt-4 text-[14px] leading-relaxed text-ink-soft">
         {copy.scan.labelReassurance}
       </p>
     </div>

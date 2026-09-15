@@ -120,7 +120,9 @@ export const copy = {
     // Rule 5 — the optional list preview
     countedLabel: "What we counted · in the order on the bottle",
     countedMore: (n: number) => `${n} more, in order`,
-    seeWholeList: "See the whole list",
+    showAll: (n: number) => `Show all ${n} ingredients`,
+    showLess: "Show fewer",
+    hiddenRows: (n: number) => `${n} more`,
     // Rule 2 — the one and only disclosure about misreads
     misreadNote:
       "Computers misread small print. If you want to be sure, compare this with the bottle — anything wrong, you can change.",

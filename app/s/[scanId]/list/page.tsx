@@ -29,7 +29,7 @@ export default async function ScanListPage({
     <div className="mx-auto w-full max-w-md px-5 pb-16">
       <Link
         href={`/s/${scan.id}`}
-        className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-muted"
+        className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-soft"
       >
         <ArrowLeft size={14} strokeWidth={2} aria-hidden />
         {copy.list.back}
@@ -38,15 +38,15 @@ export default async function ScanListPage({
       <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink">
         {copy.list.title}
       </h1>
-      <p className="mt-1.5 text-[14px] leading-relaxed text-muted">
+      <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">
         {copy.list.body}
       </p>
 
       <div className="mt-6 flex items-baseline justify-between">
-        <h2 className="text-[13px] font-medium text-muted">
+        <h2 className="text-[13px] font-medium text-ink-soft">
           {copy.list.inLabelOrder}
         </h2>
-        <span className="text-[13px] text-muted">{counted.length}</span>
+        <span className="text-[14px] text-ink-soft">{counted.length}</span>
       </div>
 
       <ul className="mt-1 divide-y divide-line">
@@ -64,11 +64,11 @@ export default async function ScanListPage({
         ))}
       </ul>
 
-      <p className="mt-5 text-[13px] leading-relaxed text-muted">
+      <p className="mt-5 text-[14px] leading-relaxed text-ink-soft">
         {copy.list.orderNote}
       </p>
 
-      <p className="mt-4 text-[13px] text-muted">{copy.list.notRequired}</p>
+      <p className="mt-4 text-[14px] text-ink-soft">{copy.list.notRequired}</p>
     </div>
   );
 }
