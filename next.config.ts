@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   // `@google-cloud/vision` is a heavy Node-only dependency; keep it external to the bundle.
   serverExternalPackages: ["@google-cloud/vision"],
 
+  // Dev only: testing the camera means loading the dev server from a phone on
+  // the LAN, and Next blocks its own dev assets cross-origin by default — which
+  // serves the HTML but silently withholds the JS, so nothing hydrates.
+  allowedDevOrigins: ["192.168.1.142"],
+
   async redirects() {
     // Was: app.get("/welcome", (req, res) => res.redirect("/")) in the old Express server.
     return [{ source: "/welcome", destination: "/", permanent: false }];

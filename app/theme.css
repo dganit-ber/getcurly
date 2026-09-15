@@ -198,3 +198,44 @@
     background-size: 26px 9px;
   }
 }
+
+@layer components {
+  /*
+   * The coil drawing itself, inner turn outwards, over and over — the waiting
+   * state. It fills rather than spins: a spinner says "something is happening",
+   * a curl filling says "we are reading your label", and it's the same mark the
+   * verdict screen uses.
+   *
+   * Each path carries pathLength="1", so one dash spans the whole segment
+   * whatever its real length and the offset animates cleanly from 1 to 0.
+   */
+  @keyframes coil-fill {
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 1;
+    }
+    50%,
+    80% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+
+  .coil-loader path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: coil-fill 2.1s ease-in-out infinite;
+  }
+
+  /* Respect a reduced-motion preference: show the finished curl, no drawing. */
+  @media (prefers-reduced-motion: reduce) {
+    .coil-loader path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+}

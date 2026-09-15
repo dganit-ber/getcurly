@@ -50,6 +50,13 @@ export const copy = {
     fileLimits: "JPG or PNG, up to 8 MB",
     reading: {
       steps: ["Text found", "Matching them to known ingredients", "Checking the six groups", "Looking for the product"],
+      // The label flow does exactly these three and nothing else — there is no
+      // product to look for, so listing a fourth step would sit there unfinished
+      // while the real work (matching) had already moved on.
+      labelSteps: ["Text found", "Matching them to known ingredients", "Checking the six groups"],
+      // Shown once the wait runs past the usual case, so a long label reads as
+      // busy rather than broken.
+      stillGoing: "Still going — a long ingredients list takes a moment.",
       working: "Working out your verdict — one moment.",
       comparing: "Comparing it with the list we had — one moment.",
     },
@@ -68,6 +75,31 @@ export const copy = {
         title: "Our reader is out",
         body: "Not your photo — our side. Search for it by name and we'll check what we already have.",
         action: "Search by name",
+      },
+      notALabel: {
+        title: "That doesn't look like an ingredients list",
+        body: "We read the photo fine, but what's in it isn't an ingredients list. It's the small print on the back — usually a long paragraph of names separated by commas.",
+        action: "Take another photo",
+      },
+      rateLimited: {
+        title: "That's a lot of scans",
+        body: "You've reached the limit for this hour. It resets on its own — and the library is still searchable in the meantime.",
+        action: "Search by name",
+      },
+      tooLarge: {
+        title: "That photo's too big",
+        body: "Photos need to be under 8 MB. Your camera's normal setting is comfortably under that.",
+        action: "Choose another photo",
+      },
+      unsupported: {
+        title: "We can't read that file",
+        body: "A photo straight from your camera works — JPG, PNG or HEIC.",
+        action: "Choose another photo",
+      },
+      generic: {
+        title: "That didn't go through",
+        body: "Something on our side stopped the scan before it finished. Worth trying again.",
+        action: "Try again",
       },
     },
   },

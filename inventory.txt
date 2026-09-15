@@ -1,36 +1,47 @@
 PAGES
 
 /                        111
-/scan                     10
-/search                   10
-/products                  5
+/s/[scanId]              104
+/s/[scanId]/list          74
+layout                    40
 /results                  27
+/scan                     20
+not-found                 14
+/search                   10
+/aboutme                   5
+/products                  5
 /profile                   5
 /useful                    5
-/aboutme                   5
-layout                    40
-not-found                 14
                    ---------
-                         232
+                         420
 
 
 COMPONENTS
 
 ProductForm              166
 ScanForm                 160
+LabelCapture             127
 Search                   109
 BrandField               106
 ResultView               100
+ScanProgress              96
+PickCard                  89
 Header                    87
+IngredientList            68
+ScanError                 67
 IngredientRow             59
+ClearedGroups             50
 Uploader                  47
 AccordionSection          44
+CoilLoader                37
 ThemeToggle               37
 ScanCta                   36
 ArticleRow                33
+FlaggedIngredient         31
 TextField                 29
 UnderConstruction         26
 FreshnessBadge            24
+VerdictBlock              23
 StepList                  22
 VerdictPill               22
 SearchRow                 21
@@ -45,4 +56,180 @@ Section                    9
 SectionLabel               6
 WaveDivider                4
                    ---------
-                        1263
+                        1851
+
+
+STRUCTURE
+
+app/
+├── layout.tsx                      40
+├── not-found.tsx                   14
+├── page.tsx                       111
+├── aboutme/
+│   └── page.tsx                     5
+├── products/
+│   └── page.tsx                     5
+├── profile/
+│   └── page.tsx                     5
+├── results/
+│   └── page.tsx                    27
+├── s/
+│   └── [scanId]/
+│       ├── page.tsx               104
+│       └── list/
+│           └── page.tsx            74
+├── scan/
+│   └── page.tsx                    20
+├── search/
+│   └── page.tsx                    10
+└── useful/
+    └── page.tsx                     5
+
+components/
+├── AccordionSection.tsx            44
+├── ArticleRow.tsx                  33
+├── BrandField.tsx                 106
+├── ClearedGroups.tsx               50
+├── Coil.tsx                        16
+├── CoilLoader.tsx                  37
+├── CurlMark.tsx                    16
+├── FlaggedIngredient.tsx           31
+├── FreshnessBadge.tsx              24
+├── GroupChip.tsx                   16
+├── Header.tsx                      87
+├── IngredientList.tsx              68
+├── IngredientRow.tsx               59
+├── LabelCapture.tsx               127
+├── PickCard.tsx                    89
+├── ProductForm.tsx                166
+├── RescanBanner.tsx                12
+├── ResultView.tsx                 100
+├── ScanCta.tsx                     36
+├── ScanError.tsx                   67
+├── ScanForm.tsx                   160
+├── ScanProgress.tsx                96
+├── Search.tsx                     109
+├── SearchRow.tsx                   21
+├── Section.tsx                      9
+├── SectionLabel.tsx                 6
+├── SiteFooter.tsx                  14
+├── SoftBox.tsx                     21
+├── StatTile.tsx                    21
+├── StepList.tsx                    22
+├── TextField.tsx                   29
+├── ThemeToggle.tsx                 37
+├── UnderConstruction.tsx           26
+├── Uploader.tsx                    47
+├── VerdictBlock.tsx                23
+├── VerdictPill.tsx                 22
+└── WaveDivider.tsx                  4
+
+
+RENDER TREE
+
+/aboutme
+└── UnderConstruction
+
+layout
+└── Header
+    ├── CurlMark
+    └── ThemeToggle
+
+not-found
+
+/
+├── GroupChip
+├── ScanCta
+├── SearchRow
+├── Section
+│   └── WaveDivider
+├── SectionLabel
+├── SiteFooter
+├── SoftBox
+├── StatTile
+└── StepList
+
+/products
+└── ProductForm
+    ├── BrandField
+    └── TextField
+
+/profile
+└── UnderConstruction
+
+/results
+└── ResultView
+    ├── AccordionSection
+    ├── Coil
+    └── IngredientRow
+
+/s/[scanId]/list
+└── IngredientRow
+
+/s/[scanId]
+├── ClearedGroups
+├── FlaggedIngredient
+├── IngredientList
+│   └── IngredientRow
+├── PickCard
+└── VerdictBlock
+    └── VerdictPill
+
+/scan
+└── LabelCapture
+    ├── ScanError
+    └── ScanProgress
+        └── CoilLoader
+
+/search
+└── Search
+    ├── FreshnessBadge
+    └── VerdictPill
+
+/useful
+└── UnderConstruction
+
+
+RENDERED BY
+
+AccordionSection        ResultView
+BrandField              ProductForm
+ClearedGroups           /s/[scanId]
+Coil                    ResultView
+CoilLoader              ScanProgress
+CurlMark                Header
+FlaggedIngredient       /s/[scanId]
+FreshnessBadge          Search
+GroupChip               /
+Header                  layout
+IngredientList          /s/[scanId]
+IngredientRow           /s/[scanId]/list, IngredientList, ResultView
+LabelCapture            /scan
+PickCard                /s/[scanId]
+ProductForm             /products
+RescanBanner            Uploader
+ResultView              /results, Uploader
+ScanCta                 /
+ScanError               LabelCapture
+ScanForm                Uploader
+ScanProgress            LabelCapture
+Search                  /search
+SearchRow               /
+Section                 /
+SectionLabel            /
+SiteFooter              /
+SoftBox                 /
+StatTile                /
+StepList                /
+TextField               ProductForm
+ThemeToggle             Header
+UnderConstruction       /aboutme, /profile, /useful
+VerdictBlock            /s/[scanId]
+VerdictPill             Search, VerdictBlock
+WaveDivider             Section
+
+
+NOT RENDERED ANYWHERE
+
+ArticleRow
+Uploader

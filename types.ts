@@ -34,3 +34,26 @@ export interface Product {
 export type UploadResponse =
   | { data: [Ingredient[]] }
   | { success: false; err: string; data: string };
+
+/**
+ * Response shape of POST /api/scan/label.
+ *
+ * The failure reasons are a closed list because the UI owes her three visibly
+ * different screens (rule: errors say what happened and what to do) — a partial
+ * read, nothing readable, and our reader being down are not the same problem.
+ */
+export type LabelScanFailure =
+  | "no_file"
+  | "too_large"
+  | "unsupported_type"
+  | "rate_limited"
+  | "ocr_down"
+  | "no_text"
+  | "not_a_label"
+  | "partial"
+  | "server_error"
+  | "server_misconfigured";
+
+export type LabelScanResponse =
+  | { ok: true; scanId: number; verdict: "clear" | "skip"; count: number }
+  | { ok: false; reason: LabelScanFailure; count?: number };
