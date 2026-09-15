@@ -64,19 +64,14 @@ ALL FILES
 ├── .env.local.example                            13
 ├── .gitignore                                    43
 ├── .prettierrc.json                               3
-├── add.gif                                     338K
-├── camera.png                                   31K
-├── creative-colorful-camera-logo-design-symbol-vector-25619440.jpg    5K
-├── dontfit.gif                                 1.2M
 ├── eslint.config.mjs                             10
-├── fit.gif                                     684K
-├── inventory.txt                                334
+├── found-bugs.txt                                 2
+├── inventory.txt                                316
 ├── next.config.ts                                36
 ├── package-lock.json                          10502
 ├── package.json                                  41
 ├── postcss.config.mjs                             5
-├── README.md                                     92
-├── search.gif                                  780K
+├── README.md                                     77
 ├── tsconfig.json                                 41
 ├── types.ts                                      59
 ├── vitest.config.ts                              17
@@ -178,10 +173,11 @@ ALL FILES
 │   ├── freshness.ts                              24
 │   ├── ingredients.ts                           144
 │   ├── ipHash.ts                                 25
-│   ├── labelScan.ts                             146
-│   ├── labelTokens.test.ts                       84
-│   ├── labelTokens.ts                           104
+│   ├── labelScan.ts                             181
+│   ├── labelTokens.test.ts                      168
+│   ├── labelTokens.ts                           216
 │   ├── library.ts                                38
+│   ├── matchIngredient.db.test.ts               135
 │   ├── matchIngredients.test.ts                  29
 │   ├── matchIngredients.ts                       44
 │   ├── rateLimit.ts                              52
@@ -193,35 +189,25 @@ ALL FILES
 │       ├── read.ts                               27
 │       └── server.ts                             22
 ├── public/
-│   ├── 1_NWsriD1xdDlAlbm4tmjz4g.jpeg            75K
-│   ├── 306960_10150386541734467_60668144_n.jpg   57K
-│   ├── Color Hunt Palette 72652.png             68K
-│   ├── giphy.gif                               763K
-│   ├── go.png                                  375K
 │   ├── hamburger-menu-icon-clipart-1.jpg        27K
 │   ├── hamburger.jpg                            27K
-│   ├── hamburger.png                            20K
-│   ├── kreative-social-media-icons-facebook_1340-11108.jpg   74K
-│   ├── mememe.jpg                              117K
-│   ├── minifindstore_spin.gif                   34K
-│   ├── oops.jpg                                 13K
-│   ├── stop.jpg                                 39K
-│   ├── stop.png                                 41K
-│   ├── underconstruction.jpg                    59K
-│   └── Untitled-2.ico                          847K
+│   └── hamburger.png                            20K
 ├── scripts/
 │   ├── backfillIngredients.ts                   180
 │   ├── importObf.ts                             131
-│   └── inventory.mjs                            240
+│   └── inventory.mjs                            241
 └── supabase/
     └── migration/
         ├── 0001_init.sql                         32
         ├── 0002_auth.sql                          0
         ├── 0003_freshness.sql                    51
         ├── 0004_rewrite_foundation.sql         1131
-        └── 0005_bulk_ingredient_match.sql        58
+        ├── 0005_bulk_ingredient_match.sql        58
+        ├── 0006_space_insensitive_match.sql      72
+        ├── 0007_bare_alcohol_entry.sql           28
+        └── 0008_ocr_confusable_match.sql        110
 
-129 files · 18,710 lines of text
+115 files · 19,256 lines of text
 
 
 RENDER TREE

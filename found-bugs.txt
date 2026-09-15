@@ -1,0 +1,2 @@
+When an ingredient was cut by end of line, claude counted it as the end of the ingredient's name, creating 2 non-existing ingredients. had issues to recognize edge cases for removal non-alpha numeric values, used old code to improve.
+instructed to use a secret instead of config for salt, did that twice even after I added screenshots and logs.

@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { IngredientMatch, MatchCandidate, ScanItemInput } from "@/lib/db.types";
-import { splitLabelText } from "@/lib/labelTokens";
+import { tokenizeLabel, type LabelToken } from "@/lib/labelTokens";
 
 /** A label runs to 30-60 ingredients; this keeps it to a few round trips. */
 const CHUNK = 20;
@@ -77,12 +77,25 @@ export const buildScanItems = async (
   supabase: SupabaseClient,
   rawText: string,
 ): Promise<ScanItemInput[]> => {
-  const tokens = splitLabelText(rawText);
+  const tokens = tokenizeLabel(rawText);
   if (tokens.length === 0) return [];
 
   const bulk = await matchAllAtOnce(supabase, tokens);
   return bulk ?? matchOneAtATime(supabase, tokens);
 };
+
+/**
+ * Pick between the two readings of a wrapped token by which one the dictionary
+ * recognises better. `match_ingredient` scores exact 1.0, alias 0.98 and fuzzy
+ * by similarity, so the highest best-score is the better reading. Neither
+ * matching leaves it unresolved, which is benign.
+ */
+const bestOf = (lists: IngredientMatch[][]): IngredientMatch[] =>
+  lists.reduce<IngredientMatch[]>((best, list) => {
+    if (list.length === 0) return best;
+    if (best.length === 0) return list;
+    return list[0].score > best[0].score ? list : best;
+  }, []);
 
 /**
  * The whole label in a single round trip. Returns null when the function isn't
@@ -91,33 +104,49 @@ export const buildScanItems = async (
  */
 const matchAllAtOnce = async (
   supabase: SupabaseClient,
-  tokens: string[],
+  tokens: LabelToken[],
 ): Promise<ScanItemInput[] | null> => {
+  // Both readings of a wrapped token go in the same request — it's one round
+  // trip either way, so asking costs nothing.
+  const probes: string[] = [];
+  const ownerOf: number[] = [];
+  tokens.forEach((token, i) => {
+    for (const reading of [token.text, ...token.alternates]) {
+      probes.push(reading);
+      ownerOf.push(i);
+    }
+  });
+
   const { data, error } = await supabase.rpc("match_ingredients_bulk", {
-    p_texts: tokens,
+    p_texts: probes,
   });
   if (error || !data) return null;
 
-  // Rows arrive flat, best-first within each index; regroup by input position.
-  const byIndex = new Map<number, IngredientMatch[]>();
+  // Rows arrive flat, best-first within each index; regroup by probe position.
+  const byProbe = new Map<number, IngredientMatch[]>();
   for (const row of data as (IngredientMatch & { input_index: number })[]) {
-    const list = byIndex.get(row.input_index) ?? [];
+    const list = byProbe.get(row.input_index) ?? [];
     list.push(row);
-    byIndex.set(row.input_index, list);
+    byProbe.set(row.input_index, list);
   }
 
+  const readings = tokens.map(() => [] as IngredientMatch[][]);
+  probes.forEach((_, p) => readings[ownerOf[p]].push(byProbe.get(p + 1) ?? []));
+
   return tokens.map((token, i) => {
-    const matches = byIndex.get(i + 1) ?? [];
+    const matches = bestOf(readings[i]);
+    // raw_text stays the spaced reading — it's what the camera saw. When the
+    // glued reading won, the canonical name comes back as resolved_name anyway.
     return matches.length > 0
-      ? resolved(token, i + 1, matches)
-      : unresolved(token, i + 1);
+      ? resolved(token.text, i + 1, matches)
+      : unresolved(token.text, i + 1);
   });
 };
 
 /** One request per ingredient. Correct but slow; kept only as the fallback. */
 const matchOneAtATime = async (
   supabase: SupabaseClient,
-  tokens: string[],
+  tokens: LabelToken[],
 ): Promise<ScanItemInput[]> => {
   const items: ScanItemInput[] = [];
 
@@ -126,17 +155,23 @@ const matchOneAtATime = async (
     const settled = await Promise.all(
       batch.map(async (token, i): Promise<ScanItemInput> => {
         const position = offset + i + 1; // pos is 1-indexed and must be > 0
-        const { data, error } = await supabase.rpc("match_ingredient", {
-          p_text: token,
-        });
-        // One failed lookup shouldn't cost her the whole scan — an unresolved
-        // row is benign, so the verdict stays correct, just less specific.
-        if (error) return unresolved(token, position);
+        const readings = [token.text, ...token.alternates];
 
-        const matches = (data ?? []) as IngredientMatch[];
+        const lists = await Promise.all(
+          readings.map(async (reading) => {
+            const { data, error } = await supabase.rpc("match_ingredient", {
+              p_text: reading,
+            });
+            // One failed lookup shouldn't cost her the whole scan — an
+            // unresolved row is benign, so the verdict stays correct.
+            return error ? [] : ((data ?? []) as IngredientMatch[]);
+          }),
+        );
+
+        const matches = bestOf(lists);
         return matches.length > 0
-          ? resolved(token, position, matches)
-          : unresolved(token, position);
+          ? resolved(token.text, position, matches)
+          : unresolved(token.text, position);
       }),
     );
     items.push(...settled);

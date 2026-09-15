@@ -7,8 +7,15 @@
  * second set of rules to keep in step with the database's.
  */
 
-/** Longest plausible INCI name. Past this it's a run-on paragraph or OCR noise. */
-const MAX_TOKEN_LENGTH = 60;
+/**
+ * Longest token we keep. Past this it's a run-on paragraph or OCR noise.
+ *
+ * Generous, because OCR drops the odd comma and two ingredients then arrive as
+ * one long token. Dropping that is silent data loss — the ingredient vanishes
+ * from the list with nothing to show she lost it — whereas keeping it leaves a
+ * visible, editable row. The longest real INCI names run to about 60.
+ */
+const MAX_TOKEN_LENGTH = 110;
 
 /**
  * The ingredients header, in the languages that share a bottle in Europe. Not
@@ -37,32 +44,137 @@ export const extractIngredientSection = (text: string): string => {
 };
 
 /**
- * Split on the same newline/comma boundaries the old JS matcher used — real
- * labels separate ingredients with commas, and OCR turns column breaks into
- * newlines. Semicolons show up on a minority of European labels.
+ * Rejoin lines that OCR broke mid-ingredient.
+ *
+ * In an INCI list the *comma* is the separator; a newline is only where the
+ * column ran out. Splitting on newlines turns one ingredient into two —
+ * "COCO-GLU / COSIDE" becomes two rows, and neither matches anything.
+ *
+ * A line ending in a hyphen is a word hyphenated across the break
+ * ("BEHENTRIMONIUM METHOSUL- / FATE"), so it rejoins with nothing. Any other
+ * break is between words and rejoins with a single space, which is what
+ * normalize_ingredient collapses punctuation to anyway.
  */
-export const splitLabelText = (text: string): string[] => {
+/**
+ * Drop what the label prints after the ingredient list.
+ *
+ * The list is comma-separated; the distributor, address and batch code that
+ * follow it are not. So past the final comma only the first line can still be
+ * an ingredient — without this, "Dist / Maesa SAS" is unwrapped straight onto
+ * the last one.
+ */
+const trimTrailingText = (section: string): string => {
+  const lastComma = section.lastIndexOf(",");
+  if (lastComma === -1) return section;
+
+  const [first, ...rest] = section.slice(lastComma + 1).split(/\r?\n/);
+  const kept = [first];
+
+  // Keep following lines only while they still read as ingredient text. That
+  // distinguishes a last ingredient that wrapped ("...SARGASSUM / EXTRACT")
+  // from where the label stops listing and starts printing "Dist / Maesa SAS".
+  for (const line of rest) {
+    if (!looksLikeIngredientList([line.trim()])) break;
+    kept.push(line);
+  }
+
+  return section.slice(0, lastComma + 1) + kept.join("\n");
+};
+
+/**
+ * Close up a word hyphenated across a line break.
+ *
+ * Runs before anything else looks at line structure: this break is unambiguous,
+ * and leaving it in place lets a wrapped final ingredient look like the start of
+ * the distributor block. Hyphen, non-breaking hyphen, en and em dash — printed
+ * labels use all four and OCR passes through whichever it saw.
+ *
+ * Note Vision often drops the break hyphen altogether, in which case nothing
+ * here can help: "COCO-GLU / COSIDE" is indistinguishable from two words of one
+ * name, and gluing on a guess would corrupt real ingredients.
+ */
+const dehyphenate = (text: string): string =>
+  text.replace(/[-\u2010\u2011\u2013\u2014][ \t]*\r?\n[ \t]*/g, "");
+
+/**
+ * Every remaining break is wrapping. It becomes a marker rather than a space,
+ * because at this point we genuinely don't know which reading is right:
+ * "SARGASSUM / FILIPENDULA" wants a space, "COCO-GLU / COSIDE" wants nothing,
+ * and the text gives no way to tell. The marker keeps both readings available
+ * so the dictionary can decide later.
+ */
+const WRAP = "\u0001";
+
+const unwrapLines = (text: string): string =>
+  text.replace(/[ \t]*\r?\n[ \t]*/g, WRAP);
+
+/**
+ * Split a label into ingredient tokens on commas and semicolons.
+ *
+ * Newlines are unwrapped first rather than treated as separators. The one
+ * exception is a label with no commas at all, where the line breaks really are
+ * the separator — rare, but it would otherwise collapse to a single token.
+ */
+const tidy = (token: string): string =>
+  token
+    .trim()
+    // OCR emits runs of spaces where the label had kerning.
+    .replace(/\s+/g, " ")
+    // Trailing sentence punctuation, and the "*" that marks organic origin.
+    .replace(/[.\s*]+$/, "")
+    .trim();
+
+const worthKeeping = (token: string): boolean =>
+  token.length > 0 &&
+  token.length <= MAX_TOKEN_LENGTH &&
+  // A token with no letters is a stray number, bullet or bracket.
+  /[a-z]/i.test(token);
+
+export interface LabelToken {
+  /** What the camera read, with a wrapped line rejoined by a space. */
+  text: string;
+  /**
+   * Other ways the same token could be read, for the dictionary to choose
+   * between. OCR breaks a word at a line end *and* drops spaces into the middle
+   * of one, and neither leaves a mark in the text — "DIMETH ICONE" and
+   * "SARGASSUM EXTRACT" are the same shape, one wanting to be closed up and one
+   * not. Guessing here would corrupt real names, so both go to the dictionary
+   * and the better match wins.
+   */
+  alternates: string[];
+}
+
+export const tokenizeLabel = (text: string): LabelToken[] => {
   if (!text) return [];
 
-  return extractIngredientSection(text)
-    .split(/[\n,;]+/)
-    .map((token) =>
-      token
-        .trim()
-        // OCR emits runs of spaces where the label had kerning.
-        .replace(/\s+/g, " ")
-        // Trailing sentence punctuation, and the "*" that marks organic origin.
-        .replace(/[.\s*]+$/, "")
-        .trim(),
-    )
-    .filter(
-      (token) =>
-        token.length > 0 &&
-        token.length <= MAX_TOKEN_LENGTH &&
-        // A token with no letters is a stray number, bullet or bracket.
-        /[a-z]/i.test(token),
-    );
+  const section = trimTrailingText(dehyphenate(extractIngredientSection(text)));
+  const parts = unwrapLines(section).split(/[,;]+/);
+  const separated =
+    parts.length === 1 && /\n/.test(section) ? section.split(/\r?\n/) : parts;
+
+  return separated
+    .map((raw) => {
+      const text = tidy(raw.split(WRAP).join(" "));
+
+      const candidates = [
+        // Closed up at the line break only.
+        raw.includes(WRAP) ? tidy(raw.split(WRAP).join("")) : null,
+        // Closed up everywhere, for a space OCR dropped mid-word. Harmless on a
+        // genuinely multi-word name: it simply scores worse and loses.
+        /\s/.test(text) ? text.replace(/\s+/g, "") : null,
+      ];
+
+      return {
+        text,
+        alternates: [...new Set(candidates.filter((c): c is string => !!c && c !== text))],
+      };
+    })
+    .filter(({ text: token }) => worthKeeping(token));
 };
+
+/** The tokens alone, for callers that don't need the alternate reading. */
+export const splitLabelText = (text: string): string[] =>
+  tokenizeLabel(text).map((token) => token.text);
 
 /**
  * Words that appear on very nearly every cosmetic label. Water under one name or
