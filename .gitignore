@@ -38,3 +38,6 @@ secrets.json
 google.json
 google1.json
 "google (3).json"
+
+# Regenerated diagnostic dump from scripts/backfillIngredients.ts
+ingredient-backlog.txt
