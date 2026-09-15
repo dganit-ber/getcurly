@@ -59,70 +59,169 @@ WaveDivider                4
                         1851
 
 
-STRUCTURE
+ALL FILES
 
-app/
-├── layout.tsx                      40
-├── not-found.tsx                   14
-├── page.tsx                       111
-├── aboutme/
-│   └── page.tsx                     5
-├── products/
-│   └── page.tsx                     5
-├── profile/
-│   └── page.tsx                     5
-├── results/
-│   └── page.tsx                    27
-├── s/
-│   └── [scanId]/
-│       ├── page.tsx               104
-│       └── list/
-│           └── page.tsx            74
-├── scan/
-│   └── page.tsx                    20
-├── search/
-│   └── page.tsx                    10
-└── useful/
-    └── page.tsx                     5
+├── .env.local.example                            13
+├── .gitignore                                    43
+├── .prettierrc.json                               3
+├── add.gif                                     338K
+├── camera.png                                   31K
+├── creative-colorful-camera-logo-design-symbol-vector-25619440.jpg    5K
+├── dontfit.gif                                 1.2M
+├── eslint.config.mjs                             10
+├── fit.gif                                     684K
+├── inventory.txt                                334
+├── next.config.ts                                36
+├── package-lock.json                          10502
+├── package.json                                  41
+├── postcss.config.mjs                             5
+├── README.md                                     92
+├── search.gif                                  780K
+├── tsconfig.json                                 41
+├── types.ts                                      59
+├── vitest.config.ts                              17
+├── .vscode/
+│   └── settings.json                              3
+├── app/
+│   ├── fonts.ts                                  18
+│   ├── globals.css                              132
+│   ├── icon.svg                                   8
+│   ├── layout.tsx                                40
+│   ├── not-found.tsx                             14
+│   ├── page.tsx                                 111
+│   ├── theme.css                                241
+│   ├── aboutme/
+│   │   └── page.tsx                               5
+│   ├── api/
+│   │   ├── context/
+│   │   │   └── ResultContext.tsx                 69
+│   │   ├── products/
+│   │   │   ├── route.ts                          55
+│   │   │   └── search/
+│   │   │       └── route.ts                      29
+│   │   ├── scan/
+│   │   │   └── label/
+│   │   │       └── route.ts                     119
+│   │   ├── scans/
+│   │   │   └── [id]/
+│   │   │       └── resolve/
+│   │   │           └── route.ts                  98
+│   │   └── upload/
+│   │       └── route.ts                         111
+│   ├── products/
+│   │   └── page.tsx                               5
+│   ├── profile/
+│   │   └── page.tsx                               5
+│   ├── results/
+│   │   └── page.tsx                              27
+│   ├── s/
+│   │   └── [scanId]/
+│   │       ├── page.tsx                         104
+│   │       └── list/
+│   │           └── page.tsx                      74
+│   ├── scan/
+│   │   └── page.tsx                              20
+│   ├── search/
+│   │   └── page.tsx                              10
+│   └── useful/
+│       └── page.tsx                               5
+├── components/
+│   ├── AccordionSection.tsx                      44
+│   ├── ArticleRow.tsx                            33
+│   ├── BrandField.tsx                           106
+│   ├── ClearedGroups.tsx                         50
+│   ├── Coil.tsx                                  16
+│   ├── CoilLoader.tsx                            37
+│   ├── CurlMark.tsx                              16
+│   ├── FlaggedIngredient.tsx                     31
+│   ├── FreshnessBadge.tsx                        24
+│   ├── GroupChip.tsx                             16
+│   ├── Header.tsx                                87
+│   ├── IngredientList.tsx                        68
+│   ├── IngredientRow.tsx                         59
+│   ├── LabelCapture.tsx                         127
+│   ├── PickCard.tsx                              89
+│   ├── ProductForm.tsx                          166
+│   ├── RescanBanner.tsx                          12
+│   ├── ResultView.tsx                           100
+│   ├── ScanCta.tsx                               36
+│   ├── ScanError.tsx                             67
+│   ├── ScanForm.tsx                             160
+│   ├── ScanProgress.tsx                          96
+│   ├── Search.tsx                               109
+│   ├── SearchRow.tsx                             21
+│   ├── Section.tsx                                9
+│   ├── SectionLabel.tsx                           6
+│   ├── SiteFooter.tsx                            14
+│   ├── SoftBox.tsx                               21
+│   ├── StatTile.tsx                              21
+│   ├── StepList.tsx                              22
+│   ├── TextField.tsx                             29
+│   ├── ThemeToggle.tsx                           37
+│   ├── UnderConstruction.tsx                     26
+│   ├── Uploader.tsx                              47
+│   ├── VerdictBlock.tsx                          23
+│   ├── VerdictPill.tsx                           22
+│   └── WaveDivider.tsx                            4
+├── Documentation/
+│   ├── DEPRECATIONS.md                          131
+│   ├── GOOGLE_VISION.md                         214
+│   └── SUPABASE.md                              160
+├── lib/
+│   ├── brandMatch.ts                             76
+│   ├── brands.ts                                381
+│   ├── coil.ts                                   13
+│   ├── copy.ts                                  335
+│   ├── db.types.ts                              247
+│   ├── downscale.ts                              49
+│   ├── fonts.ts                                  13
+│   ├── freshness.ts                              24
+│   ├── ingredients.ts                           144
+│   ├── ipHash.ts                                 25
+│   ├── labelScan.ts                             146
+│   ├── labelTokens.test.ts                       84
+│   ├── labelTokens.ts                           104
+│   ├── library.ts                                38
+│   ├── matchIngredients.test.ts                  29
+│   ├── matchIngredients.ts                       44
+│   ├── rateLimit.ts                              52
+│   ├── scans.ts                                  70
+│   ├── theme.ts                                  53
+│   ├── verdict.ts                                22
+│   ├── vision.ts                                 34
+│   └── supabase/
+│       ├── read.ts                               27
+│       └── server.ts                             22
+├── public/
+│   ├── 1_NWsriD1xdDlAlbm4tmjz4g.jpeg            75K
+│   ├── 306960_10150386541734467_60668144_n.jpg   57K
+│   ├── Color Hunt Palette 72652.png             68K
+│   ├── giphy.gif                               763K
+│   ├── go.png                                  375K
+│   ├── hamburger-menu-icon-clipart-1.jpg        27K
+│   ├── hamburger.jpg                            27K
+│   ├── hamburger.png                            20K
+│   ├── kreative-social-media-icons-facebook_1340-11108.jpg   74K
+│   ├── mememe.jpg                              117K
+│   ├── minifindstore_spin.gif                   34K
+│   ├── oops.jpg                                 13K
+│   ├── stop.jpg                                 39K
+│   ├── stop.png                                 41K
+│   ├── underconstruction.jpg                    59K
+│   └── Untitled-2.ico                          847K
+├── scripts/
+│   ├── backfillIngredients.ts                   180
+│   ├── importObf.ts                             131
+│   └── inventory.mjs                            240
+└── supabase/
+    └── migration/
+        ├── 0001_init.sql                         32
+        ├── 0002_auth.sql                          0
+        ├── 0003_freshness.sql                    51
+        ├── 0004_rewrite_foundation.sql         1131
+        └── 0005_bulk_ingredient_match.sql        58
 
-components/
-├── AccordionSection.tsx            44
-├── ArticleRow.tsx                  33
-├── BrandField.tsx                 106
-├── ClearedGroups.tsx               50
-├── Coil.tsx                        16
-├── CoilLoader.tsx                  37
-├── CurlMark.tsx                    16
-├── FlaggedIngredient.tsx           31
-├── FreshnessBadge.tsx              24
-├── GroupChip.tsx                   16
-├── Header.tsx                      87
-├── IngredientList.tsx              68
-├── IngredientRow.tsx               59
-├── LabelCapture.tsx               127
-├── PickCard.tsx                    89
-├── ProductForm.tsx                166
-├── RescanBanner.tsx                12
-├── ResultView.tsx                 100
-├── ScanCta.tsx                     36
-├── ScanError.tsx                   67
-├── ScanForm.tsx                   160
-├── ScanProgress.tsx                96
-├── Search.tsx                     109
-├── SearchRow.tsx                   21
-├── Section.tsx                      9
-├── SectionLabel.tsx                 6
-├── SiteFooter.tsx                  14
-├── SoftBox.tsx                     21
-├── StatTile.tsx                    21
-├── StepList.tsx                    22
-├── TextField.tsx                   29
-├── ThemeToggle.tsx                 37
-├── UnderConstruction.tsx           26
-├── Uploader.tsx                    47
-├── VerdictBlock.tsx                23
-├── VerdictPill.tsx                 22
-└── WaveDivider.tsx                  4
+129 files · 18,710 lines of text
 
 
 RENDER TREE

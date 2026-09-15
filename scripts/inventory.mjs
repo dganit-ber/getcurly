@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-// Regenerates inventory.txt: every page and component with its line count,
-// a tree of where they sit on disk, and a tree of what renders what. Called by
-// the PostToolUse hook in .claude/settings.local.json — run it by hand with
-// `node scripts/inventory.mjs`.
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+// Regenerates inventory.txt: every page and component with its line count, a
+// tree of every file in the project, and a tree of what renders what.
+//
+// Run on demand — `node scripts/inventory.mjs`. Deliberately not wired to a
+// hook: regenerating on every edit churns inventory.txt on every save.
+import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { basename, dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -46,17 +48,54 @@ const section = (title, rows) => {
   ].join("\n");
 };
 
-const buildTree = (paths, base) => {
+const buildTree = (paths, base, valueFor = lineCount) => {
   const tree = {};
   for (const path of paths) {
     const parts = relative(base, path).split("/");
     let node = tree;
     parts.forEach((part, i) => {
-      if (i === parts.length - 1) node[part] = lineCount(path);
+      if (i === parts.length - 1) node[part] = valueFor(path);
       else node = node[part] ??= {};
     });
   }
   return tree;
+};
+
+/**
+ * Every file in the project, from git — which means .gitignore is honoured for
+ * free (no node_modules, no .next, no .env.local) while files that are new and
+ * not yet committed still show up. The alternative, walking the tree with a
+ * hand-maintained ignore list, drifts out of step with .gitignore.
+ */
+const projectFiles = () =>
+  execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
+    cwd: root,
+    encoding: "utf8",
+  })
+    .split("\n")
+    .filter(Boolean)
+    .map((rel) => join(root, rel))
+    .filter((path) => {
+      try {
+        return statSync(path).isFile();
+      } catch {
+        return false; // listed but deleted from the working tree
+      }
+    });
+
+/** Counting newlines in a gif is meaningless, so binaries report size instead. */
+const TEXT_EXT = /\.(ts|tsx|js|mjs|cjs|json|css|scss|md|sql|txt|ya?ml|html|svg|sh|example)$/i;
+
+/** Extensionless dotfiles (.gitignore, .npmrc) are config, and config is text. */
+const TEXT_FILE = (path) => {
+  const name = basename(path);
+  return TEXT_EXT.test(name) || (name.startsWith(".") && !name.slice(1).includes("."));
+};
+
+const measure = (path) => {
+  if (TEXT_FILE(path)) return lineCount(path);
+  const kb = statSync(path).size / 1024;
+  return kb >= 1024 ? `${(kb / 1024).toFixed(1)}M` : `${Math.round(kb)}K`;
 };
 
 const renderFileTree = (node, prefix = "") => {
@@ -71,7 +110,7 @@ const renderFileTree = (node, prefix = "") => {
     const branch = prefix + (last ? "└── " : "├── ");
     const value = node[key];
     if (typeof value !== "object") {
-      return [(branch + key).padEnd(34) + String(value).padStart(4)];
+      return [(branch + key).padEnd(46) + String(value).padStart(6)];
     }
     return [
       branch + key + "/",
@@ -156,6 +195,11 @@ const orphans = [...renderedBy]
   .map(([name]) => name)
   .sort();
 
+const allFiles = projectFiles();
+const textLines = allFiles
+  .filter(TEXT_FILE)
+  .reduce((sum, path) => sum + lineCount(path), 0);
+
 const out = [
   section(
     "PAGES",
@@ -169,13 +213,11 @@ const out = [
   ),
   "",
   "",
-  "STRUCTURE",
+  "ALL FILES",
   "",
-  "app/",
-  ...renderFileTree(buildTree(pages, join(root, "app"))),
+  ...renderFileTree(buildTree(allFiles, root, measure)),
   "",
-  "components/",
-  ...renderFileTree(buildTree(components, join(root, "components"))),
+  `${allFiles.length} files · ${textLines.toLocaleString()} lines of text`,
   "",
   "",
   "RENDER TREE",
