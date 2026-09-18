@@ -165,4 +165,37 @@ describe("tokenizeLabel alternate readings", () => {
     const [, wrapped] = tokenizeLabel("INGREDIENTS: Aqua, SARGASSUM\nEXTRACT");
     expect(new Set(wrapped.alternates).size).toBe(wrapped.alternates.length);
   });
+  it("strips the header repeated once per language", () => {
+    const tokens = splitLabelText(
+      "INGREDIENTS / INGRÉDIENTS / INGREDIENTES: WATER (AQUA, EAU), GLYCERIN",
+    );
+    expect(tokens[0]).toBe("WATER (AQUA, EAU)");
+  });
+
+  it("keeps a synonym in brackets on one row", () => {
+    const tokens = splitLabelText("INGREDIENTS: WATER (AQUA, EAU), GLYCERIN");
+    expect(tokens).toEqual(["WATER (AQUA, EAU)", "GLYCERIN"]);
+  });
+
+  it("survives a bracket OCR left open", () => {
+    const tokens = splitLabelText("INGREDIENTS: WATER (AQUA, GLYCERIN");
+    expect(tokens).toEqual(["WATER (AQUA, GLYCERIN"]);
+  });
+
+  it("stops where the list ends and the marketing copy starts", () => {
+    const tokens = splitLabelText(
+      "INGREDIENTS: AQUA, FRAGRANCE (PARFUM).\ne\nDevaCurl Styling Cream, Define & Control, Style &",
+    );
+    expect(tokens).toEqual(["AQUA", "FRAGRANCE (PARFUM)"]);
+  });
+
+  it("does not end the list at ALCOHOL DENAT.", () => {
+    const tokens = splitLabelText("INGREDIENTS: ALCOHOL DENAT. AQUA, GLYCERIN");
+    expect(tokens).toContain("GLYCERIN");
+  });
+
+  it("does not end the list at a colour index", () => {
+    const tokens = splitLabelText("INGREDIENTS: AQUA, C.I. 19140, GLYCERIN");
+    expect(tokens).toContain("GLYCERIN");
+  });
 });

@@ -253,6 +253,20 @@ export const copy = {
     parkedTitle: "Adding a product",
   },
 
+  /**
+   * A barcode we know, for something that isn't hair care. The library is a
+   * whole-cosmetics import, so a nail treatment or a leather conditioner can
+   * carry a perfectly good barcode — and a Curly Girl verdict on either would
+   * be worse than no answer.
+   */
+  notHair: {
+    title: "That's not a hair product",
+    body: (name: string) =>
+      `We've got ${name} in the library, but the Curly Girl method is about what you put on your hair — so there's nothing useful for us to say about this one.`,
+    scanAnother: "Scan something else",
+    seeIngredients: "Show me the ingredients anyway",
+  },
+
   identify: {
     optional: "Optional · you already have your verdict",
     heading: "Which bottle is this?",

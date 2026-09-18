@@ -58,6 +58,9 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
 
   const onFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    // Clearing the value lets her pick the same photo again after a failed
+    // read — without it `change` never fires a second time for one file.
+    event.target.value = "";
     if (!file) return;
     setPreview(URL.createObjectURL(file));
     void submit(file);
@@ -80,19 +83,27 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
 
   return (
     <div className="flex flex-col py-4">
+      {/*
+        The input is a sibling of both labels, never nested inside one.
+        Nesting it inside a label that also carries htmlFor for the same id
+        makes the click fire twice — the label forwards to the input, and the
+        input's own click bubbles back to the label. The camera then opens a
+        second time, and cancelling that one fires `change` with an empty
+        FileList, which looks exactly like the photo being thrown away.
+      */}
+      <input
+        id="label-photo"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={onFile}
+        className="hidden"
+      />
+
       <label
         htmlFor="label-photo"
         className="relative flex h-72 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-line bg-surface-2"
       >
-        <input
-          id="label-photo"
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={onFile}
-          className="hidden"
-        />
-
         {preview ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img

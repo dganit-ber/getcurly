@@ -22,8 +22,23 @@ const MAX_TOKEN_LENGTH = 110;
  * anchored: on a real bottle this sits partway down, after the usage
  * instructions, so it has to be found rather than trimmed off the front.
  */
-const SECTION_MARKER =
-  /\b(ingredients|ingredienti|ingr[ée]dients|ingredientes|inhaltsstoffe|composition|zutaten|ingrediënten|sk[lł]adniki)\b\s*[:.\-–]?\s*/i;
+const MARKER_WORDS =
+  "ingredients|ingredienti|ingr[ée]dients|ingredientes|inhaltsstoffe|composition|zutaten|ingrediënten|sk[lł]adniki";
+
+const SECTION_MARKER = new RegExp(`\\b(${MARKER_WORDS})\\b\\s*[:.\\-–]?\\s*`, "i");
+
+/**
+ * The same header again, immediately after the first.
+ *
+ * A bottle sold across Europe prints the header once per language —
+ * "INGREDIENTS / INGRÉDIENTS / INGREDIENTES: WATER (AQUA…)". Slicing after the
+ * first match alone leaves the other two glued to the front of the first real
+ * ingredient, which is then unmatchable and reads as nonsense on the list.
+ */
+const REPEATED_MARKER = new RegExp(
+  `^[\\s/|,·•\\-–—]*(?:${MARKER_WORDS})\\b\\s*[:.\\-–]?\\s*`,
+  "i",
+);
 
 /**
  * Narrow a full-label OCR read down to the ingredients paragraph.
@@ -40,7 +55,14 @@ const SECTION_MARKER =
  */
 export const extractIngredientSection = (text: string): string => {
   const match = SECTION_MARKER.exec(text);
-  return match ? text.slice(match.index + match[0].length) : text;
+  if (!match) return text;
+
+  let rest = text.slice(match.index + match[0].length);
+  for (;;) {
+    const again = REPEATED_MARKER.exec(rest);
+    if (!again) return rest;
+    rest = rest.slice(again[0].length);
+  }
 };
 
 /**
@@ -55,6 +77,26 @@ export const extractIngredientSection = (text: string): string => {
  * break is between words and rejoins with a single space, which is what
  * normalize_ingredient collapses punctuation to anyway.
  */
+/**
+ * Cut the section where the INCI list ends and the brand's own words begin.
+ *
+ * An INCI list conventionally closes with a full stop, and what follows is
+ * packaging copy — "FRAGRANCE (PARFUM). DevaCurl Styling Cream, Define &
+ * Control, Style & Shape". The last-comma rule below can't catch that, because
+ * marketing prose has commas of its own and the *last* one then sits deep
+ * inside it.
+ *
+ * Two exceptions, both real on labels: "ALCOHOL DENAT." is an ingredient that
+ * ends in a full stop mid-list, and a colour index reads "C.I. 19140". Both are
+ * excluded rather than treated as the end of the list.
+ */
+const LIST_END = /(?<!\bdenat)(?<!\b[A-Za-z])\.\s/i;
+
+const trimAfterListEnd = (section: string): string => {
+  const end = LIST_END.exec(section);
+  return end ? section.slice(0, end.index) : section;
+};
+
 /**
  * Drop what the label prints after the ingredient list.
  *
@@ -130,6 +172,39 @@ const worthKeeping = (token: string): boolean =>
   // A token with no letters is a stray number, bullet or bracket.
   /[a-z]/i.test(token);
 
+/**
+ * Split on commas and semicolons, but not inside brackets.
+ *
+ * An INCI name carries its synonym in parentheses — "WATER (AQUA, EAU)",
+ * "CHAMOMILLA RECUTITA (MATRICARIA) EXTRACT". Splitting blindly on every comma
+ * tears those in half, and "EAU)" then arrives as its own row: visibly wrong,
+ * and it inflates every position after it.
+ *
+ * Unbalanced brackets are common in OCR, so depth never goes below zero and a
+ * bracket left open at the end still yields its token rather than swallowing
+ * the rest of the label.
+ */
+const splitTopLevel = (text: string): string[] => {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+
+  for (const char of text) {
+    if (char === "(" || char === "[") depth++;
+    else if (char === ")" || char === "]") depth = Math.max(0, depth - 1);
+
+    if ((char === "," || char === ";") && depth === 0) {
+      parts.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+
+  parts.push(current);
+  return parts;
+};
+
 export interface LabelToken {
   /** What the camera read, with a wrapped line rejoined by a space. */
   text: string;
@@ -147,8 +222,10 @@ export interface LabelToken {
 export const tokenizeLabel = (text: string): LabelToken[] => {
   if (!text) return [];
 
-  const section = trimTrailingText(dehyphenate(extractIngredientSection(text)));
-  const parts = unwrapLines(section).split(/[,;]+/);
+  const section = trimTrailingText(
+    trimAfterListEnd(dehyphenate(extractIngredientSection(text))),
+  );
+  const parts = splitTopLevel(unwrapLines(section));
   const separated =
     parts.length === 1 && /\n/.test(section) ? section.split(/\r?\n/) : parts;
 
