@@ -2,15 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getScanView } from "@/lib/scans";
-import { IngredientRow } from "@/components/IngredientRow";
+import { EditableIngredientList } from "@/components/EditableIngredientList";
 import { copy } from "@/lib/copy";
 
 /**
- * "What we counted" — the whole list the verdict was worked out from.
+ * "What we counted" — the whole list the verdict was worked out from, and the
+ * one place she can correct it.
  *
- * Read-only for now. Editing a row and re-running the verdict through
- * `fork_scan` is the next step; the rows are already the resolved names
- * (rule 5), so what's here is what counted.
+ * Optional, always: she already has her answer (rule 1), and the footer says so.
+ * The fetch stays here on the server; the editing lives in the client component
+ * below it.
  */
 export default async function ScanListPage({
   params,
@@ -38,35 +39,21 @@ export default async function ScanListPage({
       <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink">
         {copy.list.title}
       </h1>
-      <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">
+      <p className="mt-1 text-[13px] text-ink-faint">
+        {copy.list.count(counted.length)}
+      </p>
+      <p className="mt-2.5 text-[14px] leading-relaxed text-ink-soft">
         {copy.list.body}
       </p>
 
-      <div className="mt-6 flex items-baseline justify-between">
-        <h2 className="text-[13px] font-medium text-ink-soft">
-          {copy.list.inLabelOrder}
-        </h2>
-        <span className="text-[14px] text-ink-soft">{counted.length}</span>
-      </div>
+      <EditableIngredientList scanId={scan.id} counted={counted} />
 
-      <ul className="mt-1 divide-y divide-line">
-        {counted.map((item) => (
-          <IngredientRow
-            key={item.id}
-            position={item.pos}
-            name={item.resolved_name ?? item.raw_text}
-            category={
-              item.category in copy.groups
-                ? copy.groups[item.category as keyof typeof copy.groups]
-                : undefined
-            }
-          />
-        ))}
-      </ul>
-
-      <p className="mt-5 text-[14px] leading-relaxed text-ink-soft">
-        {copy.list.orderNote}
-      </p>
+      <Link
+        href="/scan?mode=label"
+        className="mt-3 block w-full py-2 text-center text-[14px] text-ink-soft"
+      >
+        {copy.list.retake}
+      </Link>
 
       <p className="mt-4 text-[14px] text-ink-soft">{copy.list.notRequired}</p>
     </div>

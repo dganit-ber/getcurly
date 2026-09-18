@@ -31,7 +31,7 @@ const toCandidate = (match: IngredientMatch): MatchCandidate => ({
  * 'unknown', which `ingredient_is_flagged` treats as benign — so a word we don't
  * know can never invent a Skip.
  */
-const unresolved = (token: string, position: number): ScanItemInput => ({
+export const unresolved = (token: string, position: number): ScanItemInput => ({
   position,
   raw_text: token,
   ingredient_id: null,
@@ -44,7 +44,7 @@ const unresolved = (token: string, position: number): ScanItemInput => ({
   resolution: "unresolved",
 });
 
-const resolved = (
+export const resolved = (
   token: string,
   position: number,
   matches: IngredientMatch[],

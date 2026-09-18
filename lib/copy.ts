@@ -237,6 +237,8 @@ export const copy = {
     barcodeAttached: "Barcode, attached",
     barcodeAttachedSub: "Read from your scan — this is what makes it instant next time",
     brandLabel: "Brand",
+    didYouMean: "Did you mean",
+    keepWhatITyped: "Keep what I typed",
     nameLabel: "Product name",
     namePlaceholder: "As printed on the front",
     typeLabel: "What kind of product is it?",
@@ -245,6 +247,10 @@ export const copy = {
     // Rule 10
     notLiveYet:
       "Nothing you add goes live straight away — it waits until a second scan agrees with it.",
+  },
+
+  products: {
+    parkedTitle: "Adding a product",
   },
 
   identify: {
@@ -261,6 +267,8 @@ export const copy = {
     addPrompt:
       "We've never seen this list before. Brand, name and what kind of product it is — that's all it takes, and the next person gets an answer in two seconds.",
     addCta: "Add this bottle",
+    saveFailed:
+      "We couldn't save that just now — your verdict is safe either way. Try again in a moment.",
   },
 
   list: {
@@ -269,8 +277,16 @@ export const copy = {
     body:
       "Computers misread small print. If something here doesn't match the bottle, change it — and we'll work the verdict out again.",
     inLabelOrder: "In label order",
+    count: (n: number) => `${n} ingredients · in the order on the bottle`,
     addMissed: "Add one we missed",
     showRest: (n: number) => `Show the remaining ${n}`,
+    save: "Save",
+    cancel: "Cancel",
+    newPlaceholder: "Ingredient as printed",
+    editLabel: (n: number) => `Ingredient ${n}`,
+    removeLabel: (name: string) => `Remove ${name}`,
+    recomputeFailed:
+      "We couldn't work the verdict out again — your original still stands. Try once more.",
     orderNote:
       "Tap any ingredient to edit it. We keep the order as printed — position is roughly how much is in there, and a sulfate at #2 isn't the same as one at #22.",
     recompute: "Work out my verdict again",

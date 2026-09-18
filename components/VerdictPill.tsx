@@ -10,17 +10,18 @@ const CONTENT = {
 /**
  * clear | skip — pill, icon, word. The only place those colours appear.
  *
- * Sized to be read at arm's length in a shop: this is the answer, and it should
- * not need looking for.
+ * Weighted rather than loud: the palette stays deliberately calm, so the pill
+ * earns attention through size and weight instead of a brighter colour. Always
+ * icon + word, so colour is never the only signal.
  */
 export const VerdictPill = ({ verdict }: { verdict: Verdict }) => {
   const { label, className, Icon } = CONTENT[verdict];
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 font-display text-[19px] font-bold tracking-tight ${className}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 font-display text-[17px] font-bold tracking-tight ${className}`}
     >
-      <Icon size={20} strokeWidth={2.25} aria-hidden />
+      <Icon size={17} strokeWidth={2.5} aria-hidden />
       {label}
     </span>
   );

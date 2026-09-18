@@ -50,10 +50,27 @@ export default async function ScanVerdictPage({
         <p className="text-[16px] font-semibold text-ink">
           {productName ? copy.verdict.looksLike(productName) : copy.verdict.unknownProduct}
         </p>
-        {!productName && (
-          <p className="mt-0.5 text-[13px] text-ink-soft">
-            {copy.verdict.unknownProductMeta}
-          </p>
+        {productName ? (
+          <Link
+            href={`/s/${scan.id}/name`}
+            className="mt-0.5 inline-block text-[13px] font-medium text-accent"
+          >
+            {copy.verdict.notRight}
+          </Link>
+        ) : (
+          <>
+            <p className="mt-0.5 text-[13px] text-ink-soft">
+              {copy.verdict.unknownProductMeta}
+            </p>
+            {/* Naming it is what lets the next person answer from a barcode —
+                so the prompt sits here, under the gap it would fill. */}
+            <Link
+              href={`/s/${scan.id}/name`}
+              className="mt-1.5 inline-block text-[13px] font-medium text-accent"
+            >
+              {copy.identify.addCta}
+            </Link>
+          </>
         )}
       </section>
 

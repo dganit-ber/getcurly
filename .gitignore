@@ -41,3 +41,12 @@ google1.json
 
 # Regenerated diagnostic dump from scripts/backfillIngredients.ts
 ingredient-backlog.txt
+
+# Rewrite handoff — plan, spec, step briefs and visual reference. Local guidance,
+# not application code.
+CLAUDE.md
+README c.md
+REWRITE-PLAN.md
+SPEC.md
+steps/
+reference/

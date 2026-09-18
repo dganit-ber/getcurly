@@ -64,6 +64,22 @@ export interface Product {
   verdict: Verdict | null;
 }
 
+/**
+ * products_like_scan(scan_id) — bottles whose stored list looks like this scan's.
+ *
+ * `matched` of `total` is what the screen says out loud ("36 of 37 ingredients
+ * identical"), so it is the count itself, not a percentage she has to interpret.
+ */
+export interface ProductCandidate {
+  product_id: number;
+  brand: string;
+  name: string;
+  type: string;
+  matched: number;
+  total: number;
+  score: number;
+}
+
 export interface Ingredient {
   id: number;
   inci_name: string;

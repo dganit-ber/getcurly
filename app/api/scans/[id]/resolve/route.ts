@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { clientIpHash } from "@/lib/ipHash";
+import { allowWrite } from "@/lib/writeGuard";
 import type { Ingredient } from "@/lib/db.types";
 
 export const runtime = "nodejs";
@@ -38,13 +39,8 @@ export async function POST(
 
   const supabase = createServerSupabaseClient();
 
-  const { data: allowed, error: limitError } = await supabase.rpc("check_rate_limit", {
-    p_ip_hash: ipHash,
-    p_action: "edit_list",
-    p_max: 40,
-    p_window: "01:00:00",
-  });
-  if (limitError) return fail("server_error", 500);
+  const allowed = await allowWrite(supabase, ipHash, "edit_list");
+  if (allowed === null) return fail("server_error", 500);
   if (!allowed) return fail("rate_limited", 429);
 
   // The chosen ingredient decides the row's category, which is what the verdict
