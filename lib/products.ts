@@ -20,6 +20,43 @@ export const getProductTypes = async (): Promise<ProductType[]> => {
   return error ? [] : ((data ?? []) as ProductType[]);
 };
 
+export interface RankedProductType extends ProductType {
+  /** How many listings carry this type. Used for order, not shown. */
+  count: number;
+}
+
+/**
+ * The closed list, busiest first.
+ *
+ * The order in `product_types` is editorial — cleanse, condition, style, treat —
+ * which is the right order to *add* a product in and the wrong one to filter by:
+ * it puts a type with two bottles above one with two hundred. Counting keeps
+ * the chips she is most likely to want in the first row, where the collapsed
+ * filter shows them.
+ *
+ * One count query per type, in parallel. It is a dozen indexed counts against a
+ * closed list that changes by migration, not a scan of the table.
+ */
+export const getRankedProductTypes = async (): Promise<RankedProductType[]> => {
+  const types = await getProductTypes();
+  if (types.length === 0) return [];
+
+  const supabase = createReadClient();
+  const counted = await Promise.all(
+    types.map(async (type) => {
+      const { count } = await supabase
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .eq("type", type.slug);
+      return { ...type, count: count ?? 0 };
+    }),
+  );
+
+  // Ties fall back to the editorial order, so an empty library still reads as
+  // the list someone sat down and arranged rather than as alphabetical noise.
+  return counted.sort((a, b) => b.count - a.count || a.sort_order - b.sort_order);
+};
+
 /**
  * Bottles whose stored ingredient list looks like this scan's.
  *

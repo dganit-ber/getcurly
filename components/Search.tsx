@@ -2,45 +2,52 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@/types";
+import type { ProductType } from "@/lib/db.types";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { VerdictPill } from "@/components/VerdictPill";
+import { TypeFilter } from "@/components/TypeFilter";
+import { copy } from "@/lib/copy";
 import Link from "next/link";
 
-export const Search = ({ initialQuery }: { initialQuery?: string }) => {
+interface SearchProps {
+  initialQuery?: string;
+  initialType?: string | null;
+  types: ProductType[];
+}
+
+export const Search = ({ initialQuery, initialType, types }: SearchProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string | undefined>(initialQuery);
+  const [type, setType] = useState<string | null>(initialType ?? null);
 
   useEffect(() => {
     let ignore = false;
 
-    if (!query) {
-      (async () => {
-        try {
-          const res = await fetch("/api/products");
-          const data = (await res.json()) as Product[];
-          if (!ignore) setProducts(data);
-        } catch (e) {
-          console.error(e);
-        }
-      })();
-    } else {
-      (async () => {
-        try {
-          const res = await fetch(
-            `/api/products/search?q=${encodeURIComponent(query)}`,
-          );
-          const data = (await res.json()) as Product[];
-          if (!ignore) setProducts(data);
-        } catch (e) {
-          console.error(e);
-        }
-      })();
-    }
+    // The filter goes to the database rather than being applied to what came
+    // back: both endpoints cap at 50 rows, so filtering here would hide
+    // conditioners that never made it into the first fifty.
+    const url = query
+      ? `/api/products/search?q=${encodeURIComponent(query)}${
+          type ? `&type=${encodeURIComponent(type)}` : ""
+        }`
+      : `/api/products${type ? `?type=${encodeURIComponent(type)}` : ""}`;
+
+    (async () => {
+      try {
+        const res = await fetch(url);
+        const data = (await res.json()) as Product[];
+        if (!ignore) setProducts(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
 
     return () => {
       ignore = true;
     };
-  }, [query]);
+  }, [query, type]);
+
+  const typeLabel = types.find((entry) => entry.slug === type)?.label;
 
   const onProductSearch = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(target.value);
@@ -60,8 +67,12 @@ export const Search = ({ initialQuery }: { initialQuery?: string }) => {
         className="mt-5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
       />
 
+      <TypeFilter types={types} value={type} onChange={setType} />
+
       {products.length === 0 ? (
-        <p className="mt-6 text-[13px] text-muted">Nothing found.</p>
+        <p className="mt-6 text-[13px] text-muted">
+          {typeLabel ? copy.search.noneOfType(typeLabel) : "Nothing found."}
+        </p>
       ) : (
         <ul className="mt-5 flex flex-col gap-2.5">
           {products.map((product) => {

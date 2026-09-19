@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { IngredientRow } from "@/components/IngredientRow";
@@ -63,6 +63,12 @@ export const EditableIngredientList = ({
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  // A counter rather than a timestamp: two rows added inside the same
+  // millisecond would share a key, and React would reuse one row's open editor
+  // for the other.
+  const added = useRef(0);
+  const newKey = () => `new-${(added.current += 1)}`;
+
   const changed =
     removed.length > 0 || entries.some((entry) => entry.edited || entry.pos === null);
 
@@ -99,10 +105,37 @@ export const EditableIngredientList = ({
   };
 
   const addMissed = () => {
-    const key = `new-${Date.now()}`;
+    const key = newKey();
     setEntries((current) => [...current, { key, pos: null, name: "", edited: false }]);
     setExpanded(true);
     setEditing(key);
+  };
+
+  /** An empty row directly above this one, for something the photo dropped. */
+  const insertAbove = (entry: Entry) => {
+    const key = newKey();
+    setEntries((current) => {
+      const at = current.findIndex((item) => item.key === entry.key);
+      const next = [...current];
+      next.splice(at, 0, { key, pos: null, name: "", edited: false });
+      return next;
+    });
+    setEditing(key);
+  };
+
+  /**
+   * Where an added row goes, said in terms the server can act on: the position
+   * of the first row below it that exists on the scan she opened.
+   *
+   * Read downwards rather than up so a run of inserts above the same row keeps
+   * the order she typed them in, and so an insert above another insert resolves
+   * to the same anchor instead of to nothing. Null means the end of the list.
+   */
+  const anchorFor = (index: number): number | null => {
+    for (let i = index + 1; i < entries.length; i++) {
+      if (entries[i].pos !== null) return entries[i].pos;
+    }
+    return null;
   };
 
   const recompute = async () => {
@@ -118,8 +151,9 @@ export const EditableIngredientList = ({
             .map((entry) => ({ pos: entry.pos, text: entry.name })),
           removed,
           added: entries
-            .filter((entry) => entry.pos === null && entry.name !== "")
-            .map((entry) => entry.name),
+            .map((entry, i) => ({ text: entry.name, before: anchorFor(i), pos: entry.pos }))
+            .filter((entry) => entry.pos === null && entry.text !== "")
+            .map(({ text, before }) => ({ text, before })),
         }),
       });
       const body = await res.json();
@@ -169,8 +203,10 @@ export const EditableIngredientList = ({
               name={entry.name}
               category={entry.category}
               removeLabel={copy.list.removeLabel}
+              insertLabel={copy.list.insertLabel}
               onEdit={() => setEditing(entry.key)}
               onDelete={() => remove(entry)}
+              onInsertAbove={() => insertAbove(entry)}
             />
           ),
         )}

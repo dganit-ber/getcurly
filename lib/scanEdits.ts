@@ -14,13 +14,27 @@ export interface ScanEdit {
   text: string;
 }
 
+/**
+ * One she typed in herself. `before` is the position it belongs above on the
+ * scan she was looking at, or null to append.
+ *
+ * Position is roughly concentration (rule 5), so where an addition lands is
+ * part of what it means: a sulfate the photo missed is a different bottle at #2
+ * than at #22. Appending everything would have made the list wrong in exactly
+ * the way this screen tells her matters.
+ */
+export interface ScanAddition {
+  text: string;
+  before: number | null;
+}
+
 export interface ReviseScanInput {
   scanId: number;
   ipHash: string;
   edits: ScanEdit[];
   removed: number[];
-  /** Ingredients the photo missed, appended in the order she typed them. */
-  added: string[];
+  /** Ingredients the photo missed, each where she put it. */
+  added: ScanAddition[];
 }
 
 export interface RevisedScan {
@@ -110,8 +124,8 @@ export const reviseScan = async (
 };
 
 /**
- * Build the new list: drop what she removed, re-match what she retyped, append
- * what the photo missed, then renumber 1..N.
+ * Build the new list: drop what she removed, re-match what she retyped, put
+ * what the photo missed where she put it, then renumber 1..N.
  *
  * Renumbering is not re-sorting (rule 5) — the order she saw is preserved
  * exactly; only the gaps left by a removal are closed.
@@ -130,26 +144,48 @@ const applyEdits = async (
   // and an appended row are the same problem.
   const texts = [
     ...kept.filter((row) => edited.has(row.pos)).map((row) => edited.get(row.pos)!),
-    ...added,
+    ...added.map((addition) => addition.text),
   ];
   const matches = await matchTexts(supabase, texts);
 
+  // Matches come back in the order the texts went out: every edit, then every
+  // addition. The additions are indexed separately because they're emitted out
+  // of order — each one at its own anchor rather than all at the end.
+  const editMatches = matches.slice(0, texts.length - added.length);
+  const addMatches = matches.slice(texts.length - added.length);
+
   const items: ScanItemInput[] = [];
   let next = 0;
+  const placed = new Set<number>();
+
+  const insertAt = (anchor: number | null) => {
+    added.forEach((addition, i) => {
+      if (addition.before !== anchor || placed.has(i)) return;
+      placed.add(i);
+      items.push(shape(addition.text, items.length + 1, addMatches[i], "user_added"));
+    });
+  };
 
   for (const row of kept) {
+    insertAt(row.pos);
+
     const text = edited.get(row.pos);
     if (text === undefined) {
       // Untouched: carry it across as it stands, at its new number.
       items.push({ ...toItem(row), position: items.length + 1 });
       continue;
     }
-    items.push(shape(text, items.length + 1, matches[next++], "user_typed"));
+    items.push(shape(text, items.length + 1, editMatches[next++], "user_typed"));
   }
 
-  for (const text of added) {
-    items.push(shape(text, items.length + 1, matches[next++], "user_added"));
-  }
+  // Appended: the ones she put at the end, and any whose anchor she removed in
+  // the same pass — dropping those would silently throw away something she
+  // typed, which is worse than putting it last.
+  insertAt(null);
+  added.forEach((addition, i) => {
+    if (placed.has(i)) return;
+    items.push(shape(addition.text, items.length + 1, addMatches[i], "user_added"));
+  });
 
   return items;
 };

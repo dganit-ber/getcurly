@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { clientIpHash } from "@/lib/ipHash";
 import { rateLimit, clientKey } from "@/lib/rateLimit";
 import { buildScanItems } from "@/lib/labelScan";
+import { isProductBarcode } from "@/lib/barcode";
 import { looksLikeIngredientList, splitLabelText } from "@/lib/labelTokens";
 import type { LabelScanFailure, LabelScanResponse } from "@/types";
 
@@ -91,10 +92,19 @@ export async function POST(req: Request) {
   const productId =
     typeof rawId === "string" && /^\d+$/.test(rawId) ? Number(rawId) : null;
 
+  // Set when she scanned a barcode we didn't have and read the label instead.
+  // Stored on the scan, which is what lets the optional naming step attach it
+  // to the listing she creates. Re-checked here rather than trusted: this
+  // reaches us from the client, and a wrong code is worse than none — it would
+  // hand the next person someone else's bottle.
+  const rawBarcode = form.get("barcode");
+  const barcode =
+    typeof rawBarcode === "string" && isProductBarcode(rawBarcode) ? rawBarcode : null;
+
   const { data, error } = await supabase.rpc("record_label_scan", {
     p_items: items,
     p_product_id: productId,
-    p_barcode: null,
+    p_barcode: barcode,
     p_raw_ocr: rawText,
     p_ip_hash: ipHash,
     p_kind: "label",

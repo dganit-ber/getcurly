@@ -12,6 +12,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 const ALLOWANCE = {
   edit_list: 40,
   add_product: 10,
+  check: 30,
 } as const;
 
 export type WriteAction = keyof typeof ALLOWANCE;

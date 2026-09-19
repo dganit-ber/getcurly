@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ScanError } from "@/components/ScanError";
+import { ManualIngredients } from "@/components/ManualIngredients";
 import { ScanProgress } from "@/components/ScanProgress";
 import { copy } from "@/lib/copy";
 import { downscaleImage } from "@/lib/downscale";
@@ -11,12 +12,15 @@ import type { LabelScanFailure, LabelScanResponse } from "@/types";
 interface LabelCaptureProps {
   /** Set when she came from a product page to re-read its label. */
   productId?: string | null;
+  /** Set when the barcode she scanned wasn't one we had. */
+  barcode?: string | null;
 }
 
 type State =
   | { phase: "idle" }
   | { phase: "reading" }
-  | { phase: "failed"; reason: LabelScanFailure; count?: number };
+  | { phase: "failed"; reason: LabelScanFailure; count?: number }
+  | { phase: "typing" };
 
 /**
  * Read the ingredients list. Photo in, verdict out — rule 1, so there is no
@@ -27,7 +31,7 @@ type State =
  * better than a `getUserMedia` preview does. The live viewfinder arrives with
  * barcode mode, which genuinely needs it.
  */
-export const LabelCapture = ({ productId }: LabelCaptureProps) => {
+export const LabelCapture = ({ productId, barcode }: LabelCaptureProps) => {
   const router = useRouter();
   const [state, setState] = useState<State>({ phase: "idle" });
   const [preview, setPreview] = useState<string>("");
@@ -41,6 +45,7 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
     const form = new FormData();
     form.append("file", upload);
     if (productId) form.append("productId", productId);
+    if (barcode) form.append("barcode", barcode);
 
     try {
       const res = await fetch("/api/scan/label", { method: "POST", body: form });
@@ -74,6 +79,22 @@ export const LabelCapture = ({ productId }: LabelCaptureProps) => {
         reason={state.reason}
         count={state.count}
         onRetry={() => {
+          setPreview("");
+          setState({ phase: "idle" });
+        }}
+        onTypeInstead={() => setState({ phase: "typing" })}
+      />
+    );
+  }
+
+  // Whatever she was carrying goes with her: typing the list instead of
+  // photographing it doesn't make it a different bottle.
+  if (state.phase === "typing") {
+    return (
+      <ManualIngredients
+        productId={productId}
+        barcode={barcode}
+        onPhotoInstead={() => {
           setPreview("");
           setState({ phase: "idle" });
         }}

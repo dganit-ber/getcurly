@@ -11,8 +11,7 @@ export const copy = {
   home: {
     kicker: "Curly girl method",
     h1: "Is this bottle good for your curls?",
-    lede:
-      "Point your phone at it. Barcode for a quick answer, ingredients list for a certain one — and we'll tell you Clear or Skip in a few seconds.",
+    lede: "Point your phone at it. Barcode for a quick answer, ingredients list for a certain one — and we'll tell you Clear or Skip in a few seconds.",
     scanBarcode: "Scan the barcode",
     scanBarcodeSub: "Two seconds, if we've met it before",
     scanLabel: "Read the ingredients",
@@ -25,14 +24,24 @@ export const copy = {
     rulesOutLabel: "What we rule out",
     howItGoesLabel: "How it goes",
     howItGoes: [
-      { title: "Photograph the back", body: "The ingredients list, not the pretty front of the bottle." },
-      { title: "You get the answer straight away", body: "And the list we counted, if you want to compare it with the bottle yourself." },
-      { title: "Name the bottle, or don't", body: "Brand, name and type — that's what turns a barcode into an instant answer for the next person." },
+      {
+        title: "Photograph the back",
+        body: "The ingredients list, not the pretty front of the bottle.",
+      },
+      {
+        title: "You get the answer straight away",
+        body: "And the list we counted, if you want to compare it with the bottle yourself.",
+      },
+      {
+        title: "Name the bottle, or don't",
+        body: "Brand, name and type — that's what turns a barcode into an instant answer for the next person.",
+      },
     ],
     countsLabel: "The library right now",
     countWithBarcode: "products with barcodes",
     countConfirmed: "confirmed by a real scan",
-    countsNote: "That gap is the whole point of the app. Every label you read closes a little of it.",
+    countsNote:
+      "That gap is the whole point of the app. Every label you read closes a little of it.",
     readUp: "Read up",
   },
 
@@ -40,6 +49,31 @@ export const copy = {
     modeBarcode: "Barcode",
     modeLabel: "Ingredients list",
     barcodeHint: "Line up the barcode — read on your phone, nothing uploaded",
+    // The live camera. Nothing here appears before she points it at something:
+    // rule 4 — a hint is only worth showing once it's actionable.
+    camera: {
+      opening: "Opening the camera",
+      // Shown once the camera has been running a while with nothing found.
+      // Not a warning up front — by this point it's the useful thing to say.
+      stalled:
+        "No barcode yet — try moving a little closer, or straighten it up",
+      lookingUp: "Looking it up",
+      deniedTitle: "We can't get to the camera",
+      denied:
+        "Your browser is holding it back for this site. You can allow it from the address bar — or read the ingredients list instead, which works just as well.",
+      // Only reachable over a plain http:// address — every browser hides the
+      // camera outside a secure connection, so "no camera" would be a lie.
+      insecureTitle: "The camera needs a secure connection",
+      insecure:
+        "Your browser only opens the camera on an address starting with https. Open getcurly.ink directly and it will work — or read the ingredients list instead.",
+      noneTitle: "No camera on this device",
+      none: "Barcode scanning needs one. The ingredients list works from a photo you already have.",
+      failedTitle: "The camera stopped",
+      failed:
+        "It was interrupted before we read anything. Starting it again usually sorts it.",
+      retry: "Start the camera again",
+      useLabel: "Read the ingredients list instead",
+    },
     labelHint: "Fill the frame with the ingredients paragraph",
     // Rule 4: no warnings before a scan.
     labelReassurance:
@@ -49,11 +83,20 @@ export const copy = {
     typeInstead: "Type the brand instead",
     fileLimits: "JPG or PNG, up to 8 MB",
     reading: {
-      steps: ["Text found", "Matching them to known ingredients", "Checking the six groups", "Looking for the product"],
+      steps: [
+        "Text found",
+        "Matching them to known ingredients",
+        "Checking the six groups",
+        "Looking for the product",
+      ],
       // The label flow does exactly these three and nothing else — there is no
       // product to look for, so listing a fourth step would sit there unfinished
       // while the real work (matching) had already moved on.
-      labelSteps: ["Text found", "Matching them to known ingredients", "Checking the six groups"],
+      labelSteps: [
+        "Text found",
+        "Matching them to known ingredients",
+        "Checking the six groups",
+      ],
       // Shown once the wait runs past the usual case, so a long label reads as
       // busy rather than broken.
       stillGoing: "Still going — a long ingredients list takes a moment.",
@@ -65,6 +108,10 @@ export const copy = {
         title: "We only caught part of the list",
         body: "We read {n} ingredients, which usually means the photo cut some off. Worth another go — get closer and fill the frame.",
         action: "Take another photo",
+        // The way out when the photo keeps failing — a curved bottle, worn
+        // print, a label under shrink wrap. Offered second: another photo is
+        // still ten seconds and typing a label is not.
+        typeInstead: "Type the list instead",
       },
       noText: {
         title: "We couldn't read any text",
@@ -171,22 +218,21 @@ export const copy = {
     notNow: "Not now",
 
     checkedTitle: "Thanks — that's logged.",
-    checkedBody: "You confirmed our list matches the bottle in your hand. One tap, no photo needed.",
+    checkedBody:
+      "You confirmed our list matches the bottle in your hand. One tap, no photo needed.",
     checkedBefore: "Last checked, before",
     checkedNow: "Last checked, now",
     checkedWhatItDoesTitle: "What that does for everyone else",
     checkedWhatItDoes:
-      "The next person to scan this barcode sees \"checked today\" instead of an older date — and can decide for herself whether to look at the bottle. Nothing else in the app is this cheap to improve.",
+      'The next person to scan this barcode sees "checked today" instead of an older date — and can decide for herself whether to look at the bottle. Nothing else in the app is this cheap to improve.',
   },
 
   // Rule 8 — a mismatch needs a photo first
   rescan: {
     title: "Photograph the list on the bottle.",
-    body:
-      "We can't tell you what changed until we can read the current one. Back of the bottle, close and flat — same as any scan.",
+    body: "We can't tell you what changed until we can read the current one. Back of the bottle, close and flat — same as any scan.",
     whyTitle: "Why we need the photo",
-    why:
-      "\"It doesn't match\" tells us the record is stale but not what's actually in the bottle. With the photo we can show you the difference, fix the record, and update your verdict.",
+    why: "\"It doesn't match\" tells us the record is stale but not what's actually in the bottle. With the photo we can show you the difference, fix the record, and update your verdict.",
     flagWithoutPhoto: "Or just tell us it's out of date",
   },
 
@@ -229,13 +275,16 @@ export const copy = {
     shotOne: "The ingredients list",
     shotOneDone: (n: number) => `${n} ingredients read · back of the bottle`,
     shotTwo: "The front of the bottle",
-    shotTwoWhy: "So we can read the brand, the name and what kind of product it is",
+    shotTwoWhy:
+      "So we can read the brand, the name and what kind of product it is",
     createListing: "Create the listing",
     skipFront: "Skip the front — I'll type it",
-    youCheck: "You check whatever we read off the front before anything is saved",
+    youCheck:
+      "You check whatever we read off the front before anything is saved",
 
     barcodeAttached: "Barcode, attached",
-    barcodeAttachedSub: "Read from your scan — this is what makes it instant next time",
+    barcodeAttachedSub:
+      "Read from your scan — this is what makes it instant next time",
     brandLabel: "Brand",
     didYouMean: "Did you mean",
     keepWhatITyped: "Keep what I typed",
@@ -270,9 +319,9 @@ export const copy = {
   identify: {
     optional: "Optional · you already have your verdict",
     heading: "Which bottle is this?",
-    body:
-      "We compared your list to the library and found a close one. Naming it is what lets the next person just scan a barcode.",
-    fingerprint: (matched: number, total: number) => `${matched} of ${total} ingredients identical`,
+    body: "We compared your list to the library and found a close one. Naming it is what lets the next person just scan a barcode.",
+    fingerprint: (matched: number, total: number) =>
+      `${matched} of ${total} ingredients identical`,
     thatsIt: "That's it",
     somethingElse: "Something else",
     noneOfThose: "None of those — add it",
@@ -285,14 +334,48 @@ export const copy = {
       "We couldn't save that just now — your verdict is safe either way. Try again in a moment.",
   },
 
+  // Typing the ingredients out, reached from a photo that only caught part of
+  // the list. It says what it needs and what it will do with it, and nothing
+  // about why the photo failed — she has just read that.
+  manual: {
+    title: "Type the ingredients",
+    body: "Off the back of the bottle, in the order they're printed. Start typing and we'll finish the name — the order matters, so keep it as printed.",
+    inputLabel: "Ingredient",
+    placeholder: "Water, Cetearyl Alcohol…",
+    hint: "Separate them with commas. Tap one to remove it.",
+    count: (n: number) => (n === 1 ? "1 ingredient" : `${n} ingredients`),
+    // Said before she runs into it, because she'd otherwise type a list and be
+    // refused at the end.
+    minimum: (n: number) => `${n} more before we can work out a verdict`,
+    submit: "Work out my verdict",
+    tooFew: {
+      title: "That's not enough to go on",
+      body: "A verdict from four or five ingredients would be a guess. Add the rest of the list — or photograph it, which is quicker.",
+    },
+    failed: "That didn't save. Try once more.",
+    photoInstead: "Photograph it instead",
+  },
+
+  // The library. Its older strings are still inline in components/Search.tsx —
+  // these are the ones this screen gained with the type filter.
+  search: {
+    allTypes: "All",
+    showMoreTypes: "Show more products",
+    showFewerTypes: "Show fewer",
+    // Said differently from "nothing found", because it is a different answer:
+    // we have bottles, just none of this kind.
+    noneOfType: (label: string) =>
+      `Nothing under ${label} yet. Scanning one is how it gets here.`,
+  },
+
   list: {
     title: "What we counted",
     heading: "The list your verdict came from.",
-    body:
-      "Computers misread small print. If something here doesn't match the bottle, change it — and we'll work the verdict out again.",
+    body: "Computers misread small print. If something here doesn't match the bottle, change it — and we'll work the verdict out again.",
     inLabelOrder: "In label order",
     count: (n: number) => `${n} ingredients · in the order on the bottle`,
     addMissed: "Add one we missed",
+    insertLabel: (name: string) => `Add an ingredient above ${name}`,
     showRest: (n: number) => `Show the remaining ${n}`,
     save: "Save",
     cancel: "Cancel",
@@ -301,8 +384,14 @@ export const copy = {
     removeLabel: (name: string) => `Remove ${name}`,
     recomputeFailed:
       "We couldn't work the verdict out again — your original still stands. Try once more.",
+    // Shown instead of the editing controls on a Skip. It says why the list is
+    // fixed without implying she is being doubted, and it keeps the one escape
+    // that can still change the answer: a new photo.
+    lockedBody:
+      "We matched something on the method's list, and that doesn't change with how the rest of the list reads — so this one stays as we read it.",
+    lockedRetake: "If that's not this bottle, photograph the label again",
     orderNote:
-      "Tap any ingredient to edit it. We keep the order as printed — position is roughly how much is in there, and a sulfate at #2 isn't the same as one at #22.",
+      "Tap any ingredient to edit it, × to take it off, + to add one above it. We keep the order as printed — position is roughly how much is in there, and a sulfate at #2 isn't the same as one at #22.",
     recompute: "Work out my verdict again",
     back: "Back to my verdict",
     retake: "Retake the photo",
@@ -326,7 +415,8 @@ export const copy = {
     disclosure:
       "Ranked by match, then price — never by commission. Only products a real scan has confirmed. We may earn one.",
     whereToBuy: "Where to buy",
-    whereToBuyDisclosure: "We may earn a commission. It doesn't affect the verdict.",
+    whereToBuyDisclosure:
+      "We may earn a commission. It doesn't affect the verdict.",
     // unknown product: no buy link, recommendations instead
     whileYoureHere: "While you're here",
     whileYoureHereSub:
@@ -357,10 +447,12 @@ export const copy = {
 
   // shown on flagged rows — one sentence, what it does to curls
   why: {
-    sulfate: "A strong detergent. It strips the oils that keep your curl pattern springy.",
+    sulfate:
+      "A strong detergent. It strips the oils that keep your curl pattern springy.",
     silicone:
       "It coats the hair and won't come off without a sulfate — which is exactly the loop the method is trying to break.",
-    drying_alcohol: "Evaporates fast and takes moisture with it, leaving curls brittle.",
+    drying_alcohol:
+      "Evaporates fast and takes moisture with it, leaving curls brittle.",
     mineral_oil: "Sits on top of the hair and blocks water from getting in.",
     wax: "Builds up over washes and weighs curls down.",
   },

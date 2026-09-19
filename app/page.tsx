@@ -49,8 +49,14 @@ export default async function HomePage() {
             sub={copy.home.scanBarcodeSub}
             icon={Barcode}
           />
+          {/*
+            The mode has to be named. `/scan` on its own is barcode — the
+            two-second answer, and the right default from a cold start — so the
+            card that says "read the ingredients" was landing her on the
+            viewfinder she had just chosen not to use.
+          */}
           <ScanCta
-            href="/scan"
+            href="/scan?mode=label"
             title={copy.home.scanLabel}
             sub={copy.home.scanLabelSub}
             icon={ScanText}

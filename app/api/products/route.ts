@@ -22,12 +22,22 @@ const clean = (value: unknown): string | null => {
 // Browse list: only products a real scan has confirmed, newest first. Someone
 // landing here wants usable options, not the whole table — search still covers
 // everything, so a Skip product stays findable by name.
-export async function GET() {
+//
+// `?type=` narrows it to one product_types slug. Not validated against the
+// table: an unknown slug matches nothing and returns an empty list, which is
+// the same answer as a real type nobody has added a bottle for yet.
+export async function GET(req: Request) {
+  const type = new URL(req.url).searchParams.get("type");
+
   const supabase = createReadClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("products")
     .select("*")
-    .not("verified_at", "is", null)
+    .not("verified_at", "is", null);
+
+  if (type) query = query.eq("type", type);
+
+  const { data, error } = await query
     .order("verified_at", { ascending: false })
     .limit(50);
 

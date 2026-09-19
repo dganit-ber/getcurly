@@ -7,6 +7,13 @@ interface ScanErrorProps {
   /** How many ingredients we did read. Only meaningful for a partial read. */
   count?: number;
   onRetry: () => void;
+  /**
+   * Set for a partial read only. Some bottles never photograph well — curved,
+   * worn, under shrink wrap — and on those, "take another photo" is the same
+   * failure again. Typing is the way out, offered second because another photo
+   * is ten seconds and a label is forty ingredients.
+   */
+  onTypeInstead?: () => void;
 }
 
 /**
@@ -17,7 +24,7 @@ interface ScanErrorProps {
  *
  * Rule 4: the framing hint appears here, on an actual failure, and nowhere else.
  */
-export const ScanError = ({ reason, count, onRetry }: ScanErrorProps) => {
+export const ScanError = ({ reason, count, onRetry, onTypeInstead }: ScanErrorProps) => {
   const { errors } = copy.scan;
 
   const content = {
@@ -60,6 +67,16 @@ export const ScanError = ({ reason, count, onRetry }: ScanErrorProps) => {
           className="mt-5 w-full rounded-full border border-line py-3.5 text-center text-[15px] font-medium text-ink"
         >
           {content.action}
+        </button>
+      )}
+
+      {reason === "partial" && onTypeInstead && (
+        <button
+          type="button"
+          onClick={onTypeInstead}
+          className="mt-2 w-full py-3 text-center text-[14px] font-medium text-accent"
+        >
+          {errors.partial.typeInstead}
         </button>
       )}
     </section>

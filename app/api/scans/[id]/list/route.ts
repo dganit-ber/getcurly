@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { clientIpHash } from "@/lib/ipHash";
 import { allowWrite } from "@/lib/writeGuard";
-import { reviseScan, type ScanEdit } from "@/lib/scanEdits";
+import { reviseScan, type ScanAddition, type ScanEdit } from "@/lib/scanEdits";
 
 export const runtime = "nodejs";
 
@@ -61,11 +61,20 @@ export async function POST(
     removed.push(pos);
   }
 
-  const added: string[] = [];
+  const added: ScanAddition[] = [];
   for (const raw of Array.isArray(body.added) ? body.added : []) {
-    const text = cleanText(raw);
+    const text = cleanText(raw?.text);
     if (text === null) return fail("bad_addition", 400);
-    added.push(text);
+    // null is "put it at the end". Anything else has to be a real position on
+    // the scan she was looking at — an anchor we can't place would silently
+    // move what she typed somewhere she didn't put it.
+    const before = raw?.before === null || raw?.before === undefined
+      ? null
+      : cleanPos(raw.before);
+    if (before === null && raw?.before !== null && raw?.before !== undefined) {
+      return fail("bad_addition", 400);
+    }
+    added.push({ text, before });
   }
 
   // Nothing changed — the button that sent this should have been disabled, so
@@ -75,6 +84,19 @@ export async function POST(
   }
 
   const supabase = createServerSupabaseClient();
+
+  // The same rule the screen renders, enforced where it counts. A Skip comes
+  // from an ingredient matched against the dictionary, so there is nothing in
+  // the list to correct — and an edit path that can only ever argue a true Skip
+  // away is one we shouldn't leave open just because the buttons are hidden.
+  const { data: scan } = await supabase
+    .from("scans")
+    .select("verdict")
+    .eq("id", scanId)
+    .maybeSingle();
+  if ((scan as { verdict: string | null } | null)?.verdict === "skip") {
+    return fail("locked", 409);
+  }
 
   const allowed = await allowWrite(supabase, ipHash, "edit_list");
   if (allowed === null) return fail("server_error", 500);

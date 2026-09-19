@@ -43,16 +43,41 @@ export async function POST(
 
   const { data: product } = await supabase
     .from("products")
-    .select("id")
+    .select("id, barcode")
     .eq("id", productId)
     .maybeSingle();
   if (!product) return fail("unknown_product", 404);
+
+  const { data: scan } = await supabase
+    .from("scans")
+    .select("barcode")
+    .eq("id", scanId)
+    .maybeSingle();
 
   const { error: linkError } = await supabase
     .from("scans")
     .update({ product_id: productId })
     .eq("id", scanId);
   if (linkError) return fail("server_error", 500);
+
+  // She scanned a code we didn't have, read the label instead, and has now told
+  // us which bottle it is. Writing that code onto the listing is what makes the
+  // next scan of it instant — without this she gets "we don't have it yet" for
+  // the bottle she just named.
+  //
+  // Only onto a listing with no code of its own: overwriting one would quietly
+  // repoint it at a different bottle. `products.barcode` is unique, so a code
+  // already held elsewhere simply fails here, and the `is null` filter keeps two
+  // people naming the same bottle at once from racing. Either way the link above
+  // — the part she asked for — stands.
+  const carried = (scan as { barcode: string | null } | null)?.barcode ?? null;
+  if (carried && !(product as { barcode: string | null }).barcode) {
+    await supabase
+      .from("products")
+      .update({ barcode: carried })
+      .eq("id", productId)
+      .is("barcode", null);
+  }
 
   // Her read is now evidence about this product. Promotion decides on its own
   // terms whether that's enough; a failure here must not lose her the link.

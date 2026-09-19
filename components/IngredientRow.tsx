@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 interface IngredientRowProps {
   position: number;
@@ -8,8 +8,11 @@ interface IngredientRowProps {
   flagged?: boolean;
   onDelete?: () => void;
   onEdit?: () => void;
-  /** Wording for the remove button's label, so no copy is inlined here. */
+  /** Opens an empty row directly above this one. */
+  onInsertAbove?: () => void;
+  /** Wording for the buttons' labels, so no copy is inlined here. */
   removeLabel?: (name: string) => string;
+  insertLabel?: (name: string) => string;
 }
 
 /**
@@ -26,7 +29,9 @@ export const IngredientRow = ({
   flagged = false,
   onDelete,
   onEdit,
+  onInsertAbove,
   removeLabel,
+  insertLabel,
 }: IngredientRowProps) => {
   const label = (
     <>
@@ -66,6 +71,24 @@ export const IngredientRow = ({
         </button>
       ) : (
         <div className="flex flex-1 flex-wrap items-baseline gap-x-2 gap-y-1">{label}</div>
+      )}
+
+      {/*
+        Sits on the number rather than beside the name: an ingredient the photo
+        dropped belongs at a position, and the position is what she's pointing
+        at. Insert-above rather than drag-to-reorder — OCR drops and mangles
+        words, it rarely scrambles their order, and dragging a forty-row list on
+        a phone is a worse tool for the rarer problem.
+      */}
+      {onInsertAbove && (
+        <button
+          type="button"
+          onClick={onInsertAbove}
+          aria-label={insertLabel?.(name)}
+          className="shrink-0 self-center rounded-full p-1 text-ink-faint"
+        >
+          <Plus size={14} strokeWidth={2.4} aria-hidden />
+        </button>
       )}
 
       {onDelete && (

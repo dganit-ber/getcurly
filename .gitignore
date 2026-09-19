@@ -50,3 +50,15 @@ REWRITE-PLAN.md
 SPEC.md
 steps/
 reference/
+
+# self-signed certs from `next dev --experimental-https`
+/certificates
+
+# copied from the zxing-wasm package by postinstall, never edited by hand —
+# committing it would pin a megabyte that goes stale on the next version bump
+/public/zxing_reader.wasm
+
+# the Open Beauty Facts dump: an input to scripts/importObf.ts, not part of the
+# app. Re-download it when you next seed — theirs is updated continuously, and
+# a copy frozen in here only gets staler
+*.openbeautyfacts.org.products.csv.gz

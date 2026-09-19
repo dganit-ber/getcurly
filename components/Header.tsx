@@ -8,7 +8,8 @@ import { CurlMark } from "@/components/CurlMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
-  { href: "/scan", label: "Scan a label" },
+  // Named mode: bare /scan is the barcode viewfinder, and this link says label.
+  { href: "/scan?mode=label", label: "Scan a label" },
   { href: "/search", label: "Search products" },
   { href: "/profile", label: "Profile" },
   { href: "/products", label: "Products" },

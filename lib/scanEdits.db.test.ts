@@ -77,7 +77,11 @@ describe.skipIf(!configured)("reviseScan against the real database", () => {
 
   const revise = async (
     scanId: number,
-    changes: Partial<{ edits: { pos: number; text: string }[]; removed: number[]; added: string[] }>,
+    changes: Partial<{
+      edits: { pos: number; text: string }[];
+      removed: number[];
+      added: { text: string; before: number | null }[];
+    }>,
   ) => {
     const result = await reviseScan(supabase, {
       scanId,
@@ -153,7 +157,7 @@ describe.skipIf(!configured)("reviseScan against the real database", () => {
   it("appends an ingredient the photo missed, and counts it", async () => {
     const original = await givenScan(["Aqua", "Glycerin"]);
 
-    const revised = await revise(original.scan_id, { added: ["Sodium Lauryl Sulfate"] });
+    const revised = await revise(original.scan_id, { added: [{ text: "Sodium Lauryl Sulfate", before: null }] });
 
     expect(revised!.verdict).toBe("skip");
     const rows = await rowsOf(revised!.scanId);
@@ -179,7 +183,7 @@ describe.skipIf(!configured)("reviseScan against the real database", () => {
   it("keeps a word it doesn't know, without letting it invent a Skip", async () => {
     const original = await givenScan(["Aqua", "Glycerin"]);
 
-    const revised = await revise(original.scan_id, { added: ["Zzqx Nonsense Extract"] });
+    const revised = await revise(original.scan_id, { added: [{ text: "Zzqx Nonsense Extract", before: null }] });
 
     expect(revised!.verdict).toBe("clear");
     const rows = await rowsOf(revised!.scanId);
