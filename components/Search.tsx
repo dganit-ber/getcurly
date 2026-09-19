@@ -2,45 +2,52 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@/types";
+import type { ProductType } from "@/lib/db.types";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
-import { freshnessOf } from "@/lib/freshness";
+import { VerdictPill } from "@/components/VerdictPill";
+import { TypeFilter } from "@/components/TypeFilter";
+import { copy } from "@/lib/copy";
 import Link from "next/link";
 
-export const Search = () => {
+interface SearchProps {
+  initialQuery?: string;
+  initialType?: string | null;
+  types: ProductType[];
+}
+
+export const Search = ({ initialQuery, initialType, types }: SearchProps) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [query, setQuery] = useState<string>();
+  const [query, setQuery] = useState<string | undefined>(initialQuery);
+  const [type, setType] = useState<string | null>(initialType ?? null);
 
   useEffect(() => {
     let ignore = false;
 
-    if (!query) {
-      (async () => {
-        try {
-          const res = await fetch("/api/products");
-          const data = (await res.json()) as Product[];
-          if (!ignore) setProducts(data);
-        } catch (e) {
-          console.error(e);
-        }
-      })();
-    } else {
-      (async () => {
-        try {
-          const res = await fetch(
-            `/api/products/search?q=${encodeURIComponent(query)}`,
-          );
-          const data = (await res.json()) as Product[];
-          if (!ignore) setProducts(data);
-        } catch (e) {
-          console.error(e);
-        }
-      })();
-    }
+    // The filter goes to the database rather than being applied to what came
+    // back: both endpoints cap at 50 rows, so filtering here would hide
+    // conditioners that never made it into the first fifty.
+    const url = query
+      ? `/api/products/search?q=${encodeURIComponent(query)}${
+          type ? `&type=${encodeURIComponent(type)}` : ""
+        }`
+      : `/api/products${type ? `?type=${encodeURIComponent(type)}` : ""}`;
+
+    (async () => {
+      try {
+        const res = await fetch(url);
+        const data = (await res.json()) as Product[];
+        if (!ignore) setProducts(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
 
     return () => {
       ignore = true;
     };
-  }, [query]);
+  }, [query, type]);
+
+  const typeLabel = types.find((entry) => entry.slug === type)?.label;
 
   const onProductSearch = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(target.value);
@@ -54,30 +61,22 @@ export const Search = () => {
 
       <input
         onChange={onProductSearch}
+        defaultValue={initialQuery}
         type="text"
         placeholder="Search a product"
         className="mt-5 w-full rounded-xl border border-line bg-surface px-3.5 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
       />
 
+      <TypeFilter types={types} value={type} onChange={setType} />
+
       {products.length === 0 ? (
-        <p className="mt-6 text-[13px] text-muted">Nothing found.</p>
+        <p className="mt-6 text-[13px] text-muted">
+          {typeLabel ? copy.search.noneOfType(typeLabel) : "Nothing found."}
+        </p>
       ) : (
         <ul className="mt-5 flex flex-col gap-2.5">
           {products.map((product) => {
             const clear = product.cg_approved === "true";
-            const confirmed = freshnessOf(product.verified_at) === "fresh";
-
-            // Hue always carries the verdict — green for Clear, red for Skip.
-            // Freshness changes weight only: a confirmed verdict is solid, an
-            // unverified one is the same colour tinted back, so the two never
-            // collapse into the same grey.
-            const chip = clear
-              ? confirmed
-                ? "bg-ok text-bg"
-                : "bg-ok-bg text-ok"
-              : confirmed
-                ? "bg-bad text-bg"
-                : "bg-bad-bg text-bad";
 
             return (
               <li
@@ -95,11 +94,7 @@ export const Search = () => {
                   </div>
 
                   {product.cg_approved && (
-                    <span
-                      className={`shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${chip}`}
-                    >
-                      {clear ? "Clear" : "Skip"}
-                    </span>
+                    <VerdictPill verdict={clear ? "clear" : "skip"} />
                   )}
                 </div>
 
@@ -107,7 +102,7 @@ export const Search = () => {
                   <FreshnessBadge verifiedAt={product.verified_at} />
 
                   <Link
-                    href={`/?rescan=${product.id}&name=${encodeURIComponent(
+                    href={`/scan?rescan=${product.id}&name=${encodeURIComponent(
                       product.name,
                     )}`}
                     className="shrink-0 text-[13px] font-bold text-brand"

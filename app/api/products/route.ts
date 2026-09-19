@@ -1,55 +1,102 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { Product } from "@/types";
+import { createReadClient } from "@/lib/supabase/read";
+import { clientIpHash } from "@/lib/ipHash";
+import { allowWrite } from "@/lib/writeGuard";
+import { createProduct } from "@/lib/products";
+import type { Product } from "@/lib/db.types";
 
 export const runtime = "nodejs";
 
-// Browse list: only products that pass the method, verified ones first, capped.
-// Someone landing on /search wants usable options, not the whole table. Search
-// still covers everything, so a "Skip" product is findable by name.
-export async function GET() {
-  try {
-    const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("cg_approved", "true")
-      .order("verified_at", { ascending: false, nullsFirst: false })
-      .limit(50);
+const fail = (reason: string, status: number) =>
+  NextResponse.json({ ok: false, reason }, { status });
 
-    if (error) throw error;
-    return NextResponse.json((data ?? []) as Product[]);
-  } catch (err) {
-    console.error("error in GET /api/products:", err);
-    return NextResponse.json([], { status: 500 });
-  }
+const MAX_FIELD = 120;
+
+const clean = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const text = value.trim().replace(/\s+/g, " ");
+  return text.length > 0 && text.length <= MAX_FIELD ? text : null;
+};
+
+// Browse list: only products a real scan has confirmed, newest first. Someone
+// landing here wants usable options, not the whole table — search still covers
+// everything, so a Skip product stays findable by name.
+//
+// `?type=` narrows it to one product_types slug. Not validated against the
+// table: an unknown slug matches nothing and returns an empty list, which is
+// the same answer as a real type nobody has added a bottle for yet.
+export async function GET(req: Request) {
+  const type = new URL(req.url).searchParams.get("type");
+
+  const supabase = createReadClient();
+  let query = supabase
+    .from("products")
+    .select("*")
+    .not("verified_at", "is", null);
+
+  if (type) query = query.eq("type", type);
+
+  const { data, error } = await query
+    .order("verified_at", { ascending: false })
+    .limit(50);
+
+  if (error) return NextResponse.json([], { status: 500 });
+  return NextResponse.json((data ?? []) as Product[]);
 }
 
-// Was: POST /addproduct -> addProduct(productName, brandname, producttype, fitsSystem)
-// The old client sent `fitsSystem` as the value stored in the `cg_approved` column.
+/**
+ * Create a listing.
+ *
+ * Rule 9: a barcode is not a product — brand, name and type are all required,
+ * and the type must be one of the closed list. Rule 10: nothing is published on
+ * submit, so the row is written unverified and waits for a second scan to agree.
+ */
 export async function POST(req: Request) {
+  let ipHash: string;
   try {
-    const body = await req.json();
-    const name = body.productName;
-    const brand = body.brandname;
-    const type = body.productType;
-    const cg_approved = body.fitsSystem ?? null;
-
-    if (!name || !brand || !type) {
-      return NextResponse.json({ success: false });
-    }
-
-    const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
-      .from("products")
-      .insert({ name, brand, type, cg_approved, source: "manual" })
-      .select("name")
-      .single();
-
-    if (error) throw error;
-    return NextResponse.json({ data, success: true });
-  } catch (err) {
-    console.error("error in POST /api/products:", err);
-    return NextResponse.json({ success: false });
+    ipHash = clientIpHash(req);
+  } catch {
+    return fail("server_misconfigured", 500);
   }
+
+  const body = await req.json().catch(() => null);
+  if (!body) return fail("bad_body", 400);
+
+  const brand = clean(body.brand);
+  const name = clean(body.name);
+  const type = clean(body.type);
+  if (!brand) return fail("brand_required", 400);
+  if (!name) return fail("name_required", 400);
+  if (!type) return fail("type_required", 400);
+
+  const size = body.size === null || body.size === undefined ? null : clean(body.size);
+  const barcode =
+    body.barcode === null || body.barcode === undefined ? null : clean(body.barcode);
+
+  const scanId =
+    body.scanId === null || body.scanId === undefined ? null : Number(body.scanId);
+  if (scanId !== null && (!Number.isInteger(scanId) || scanId < 1)) {
+    return fail("bad_scan_id", 400);
+  }
+
+  const supabase = createServerSupabaseClient();
+
+  const allowed = await allowWrite(supabase, ipHash, "add_product");
+  if (allowed === null) return fail("server_error", 500);
+  if (!allowed) return fail("rate_limited", 429);
+
+  const created = await createProduct(supabase, {
+    brand,
+    name,
+    type,
+    size,
+    barcode,
+    scanId,
+  });
+  if (!created.ok) {
+    return fail(created.reason, created.reason === "bad_type" ? 400 : 500);
+  }
+
+  return NextResponse.json({ ok: true, productId: created.productId });
 }

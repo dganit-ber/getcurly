@@ -1,0 +1,435 @@
+PAGES
+
+/p/[id]                  128
+/s/[scanId]              121
+/                        117
+/p/[id]/checked           94
+/s/[scanId]/list          75
+/new                      53
+/s/[scanId]/name          49
+/scan                     41
+layout                    40
+/b/[code]                 31
+/results                  27
+/products                 17
+/search                   17
+not-found                 14
+/aboutme                   5
+/profile                   5
+/useful                    5
+                   ---------
+                         839
+
+
+COMPONENTS
+
+EditableIngredientList   245
+NameBottle               217
+Viewfinder               216
+ProductForm              166
+IngredientTypeahead      164
+ScanForm                 160
+LabelCapture             159
+Search                   120
+BrandAutocomplete        108
+BrandField               106
+IngredientRow            106
+ManualIngredients        105
+ResultView               100
+IngredientList            98
+ScanProgress              96
+PickCard                  89
+TypeFilter                89
+BarcodeCapture            88
+Header                    88
+ScanError                 84
+IngredientEditRow         78
+ProductCheck              78
+ClearedGroups             50
+Uploader                  47
+AccordionSection          44
+TypeSelect                39
+CoilLoader                37
+ThemeToggle               37
+ScanCta                   36
+LastChecked               35
+ArticleRow                33
+FlaggedIngredient         33
+ScanModeTabs              33
+CautionNote               29
+TextField                 29
+VerdictPill               28
+UnderConstruction         26
+FreshnessBadge            24
+VerdictBlock              23
+StepList                  22
+SearchRow                 21
+SoftBox                   21
+StatTile                  21
+Coil                      16
+CurlMark                  16
+GroupChip                 16
+SiteFooter                14
+RescanBanner              12
+Section                    9
+SectionLabel               6
+WaveDivider                4
+                   ---------
+                        3521
+
+
+ALL FILES
+
+├── .env.local.example                            13
+├── .gitignore                                    59
+├── .prettierrc.json                               3
+├── en.openbeautyfacts.org.products.csv.gz     17.1M
+├── eslint.config.mjs                             10
+├── found-bugs.txt                                 2
+├── inventory.txt                                320
+├── next.config.ts                                42
+├── package-lock.json                          10548
+├── package.json                                  44
+├── postcss.config.mjs                             5
+├── README.md                                     77
+├── TODO-LIST.md                                 134
+├── tsconfig.json                                 41
+├── types.ts                                      86
+├── vitest.config.ts                              21
+├── .vscode/
+│   └── settings.json                              3
+├── app/
+│   ├── fonts.ts                                  18
+│   ├── globals.css                              132
+│   ├── icon.svg                                   8
+│   ├── layout.tsx                                40
+│   ├── not-found.tsx                             14
+│   ├── page.tsx                                 117
+│   ├── theme.css                                241
+│   ├── aboutme/
+│   │   └── page.tsx                               5
+│   ├── api/
+│   │   ├── context/
+│   │   │   └── ResultContext.tsx                 69
+│   │   ├── ingredients/
+│   │   │   └── search/
+│   │   │       └── route.ts                      75
+│   │   ├── products/
+│   │   │   ├── route.ts                         102
+│   │   │   ├── [id]/
+│   │   │   │   └── check/
+│   │   │   │       └── route.ts                  56
+│   │   │   └── search/
+│   │   │       └── route.ts                      38
+│   │   ├── scan/
+│   │   │   ├── label/
+│   │   │   │   └── route.ts                     129
+│   │   │   └── manual/
+│   │   │       └── route.ts                     111
+│   │   ├── scans/
+│   │   │   └── [id]/
+│   │   │       ├── list/
+│   │   │       │   └── route.ts                 109
+│   │   │       ├── product/
+│   │   │       │   └── route.ts                  87
+│   │   │       └── resolve/
+│   │   │           └── route.ts                  94
+│   │   └── upload/
+│   │       └── route.ts                         111
+│   ├── b/
+│   │   └── [code]/
+│   │       └── page.tsx                          31
+│   ├── new/
+│   │   └── page.tsx                              53
+│   ├── p/
+│   │   └── [id]/
+│   │       ├── page.tsx                         128
+│   │       └── checked/
+│   │           └── page.tsx                      94
+│   ├── products/
+│   │   └── page.tsx                              17
+│   ├── profile/
+│   │   └── page.tsx                               5
+│   ├── results/
+│   │   └── page.tsx                              27
+│   ├── s/
+│   │   └── [scanId]/
+│   │       ├── page.tsx                         121
+│   │       ├── list/
+│   │       │   └── page.tsx                      75
+│   │       └── name/
+│   │           └── page.tsx                      49
+│   ├── scan/
+│   │   └── page.tsx                              41
+│   ├── search/
+│   │   └── page.tsx                              17
+│   └── useful/
+│       └── page.tsx                               5
+├── components/
+│   ├── AccordionSection.tsx                      44
+│   ├── ArticleRow.tsx                            33
+│   ├── BarcodeCapture.tsx                        88
+│   ├── BrandAutocomplete.tsx                    108
+│   ├── BrandField.tsx                           106
+│   ├── CautionNote.tsx                           29
+│   ├── ClearedGroups.tsx                         50
+│   ├── Coil.tsx                                  16
+│   ├── CoilLoader.tsx                            37
+│   ├── CurlMark.tsx                              16
+│   ├── EditableIngredientList.tsx               245
+│   ├── FlaggedIngredient.tsx                     33
+│   ├── FreshnessBadge.tsx                        24
+│   ├── getcurly.code-workspace                   0K
+│   ├── GroupChip.tsx                             16
+│   ├── Header.tsx                                88
+│   ├── IngredientEditRow.tsx                     78
+│   ├── IngredientList.tsx                        98
+│   ├── IngredientRow.tsx                        106
+│   ├── IngredientTypeahead.tsx                  164
+│   ├── LabelCapture.tsx                         159
+│   ├── LastChecked.tsx                           35
+│   ├── ManualIngredients.tsx                    105
+│   ├── NameBottle.tsx                           217
+│   ├── PickCard.tsx                              89
+│   ├── ProductCheck.tsx                          78
+│   ├── ProductForm.tsx                          166
+│   ├── RescanBanner.tsx                          12
+│   ├── ResultView.tsx                           100
+│   ├── ScanCta.tsx                               36
+│   ├── ScanError.tsx                             84
+│   ├── ScanForm.tsx                             160
+│   ├── ScanModeTabs.tsx                          33
+│   ├── ScanProgress.tsx                          96
+│   ├── Search.tsx                               120
+│   ├── SearchRow.tsx                             21
+│   ├── Section.tsx                                9
+│   ├── SectionLabel.tsx                           6
+│   ├── SiteFooter.tsx                            14
+│   ├── SoftBox.tsx                               21
+│   ├── StatTile.tsx                              21
+│   ├── StepList.tsx                              22
+│   ├── TextField.tsx                             29
+│   ├── ThemeToggle.tsx                           37
+│   ├── TypeFilter.tsx                            89
+│   ├── TypeSelect.tsx                            39
+│   ├── UnderConstruction.tsx                     26
+│   ├── Uploader.tsx                              47
+│   ├── VerdictBlock.tsx                          23
+│   ├── VerdictPill.tsx                           28
+│   ├── Viewfinder.tsx                           216
+│   └── WaveDivider.tsx                            4
+├── Documentation/
+│   ├── DEPRECATIONS.md                          131
+│   ├── GOOGLE_VISION.md                         214
+│   └── SUPABASE.md                              160
+├── lib/
+│   ├── barcode.test.ts                           27
+│   ├── barcode.ts                               119
+│   ├── brandMatch.ts                             76
+│   ├── brands.ts                                381
+│   ├── coil.ts                                   13
+│   ├── confidence.ts                             63
+│   ├── copy.ts                                  459
+│   ├── db.types.ts                              263
+│   ├── downscale.ts                              49
+│   ├── fonts.ts                                  13
+│   ├── freshness.ts                              24
+│   ├── hairProduct.ts                            45
+│   ├── ingredients.ts                           144
+│   ├── ipHash.ts                                 25
+│   ├── labelScan.ts                             181
+│   ├── labelTokens.test.ts                      201
+│   ├── labelTokens.ts                           293
+│   ├── library.ts                                38
+│   ├── matchIngredient.db.test.ts               135
+│   ├── matchIngredients.test.ts                  29
+│   ├── matchIngredients.ts                       44
+│   ├── products.ts                              161
+│   ├── productView.ts                            46
+│   ├── rateLimit.ts                              52
+│   ├── scanEdits.db.test.ts                     193
+│   ├── scanEdits.ts                             251
+│   ├── scans.ts                                  70
+│   ├── theme.ts                                  53
+│   ├── verdict.ts                                22
+│   ├── vision.ts                                 34
+│   ├── writeGuard.ts                             39
+│   ├── supabase/
+│   │   ├── read.ts                               27
+│   │   └── server.ts                             22
+│   └── test/
+│       └── serverOnlyStub.ts                      1
+├── public/
+│   ├── hamburger-menu-icon-clipart-1.jpg        27K
+│   ├── hamburger.jpg                            27K
+│   └── hamburger.png                            20K
+├── scripts/
+│   ├── backfillIngredients.ts                   180
+│   ├── copyZxingWasm.mjs                         24
+│   ├── importObf.ts                             257
+│   └── inventory.mjs                            241
+└── supabase/
+    └── migration/
+        ├── 0001_init.sql                         32
+        ├── 0002_auth.sql                          0
+        ├── 0003_freshness.sql                    51
+        ├── 0004_rewrite_foundation.sql         1131
+        ├── 0005_bulk_ingredient_match.sql        58
+        ├── 0006_space_insensitive_match.sql      72
+        ├── 0007_bare_alcohol_entry.sql           28
+        ├── 0008_ocr_confusable_match.sql        110
+        ├── 0009_product_fingerprint.sql         165
+        ├── 0010_stored_list_keeps_unmatched.sql    88
+        └── 0011_ingredient_suggestions.sql       97
+
+156 files · 23,780 lines of text
+
+
+RENDER TREE
+
+/aboutme
+└── UnderConstruction
+
+/b/[code]
+
+layout
+└── Header
+    ├── CurlMark
+    └── ThemeToggle
+
+/new
+
+not-found
+
+/p/[id]/checked
+
+/p/[id]
+├── CautionNote
+├── IngredientRow
+├── LastChecked
+├── ProductCheck
+└── VerdictPill
+
+/
+├── GroupChip
+├── ScanCta
+├── SearchRow
+├── Section
+│   └── WaveDivider
+├── SectionLabel
+├── SiteFooter
+├── SoftBox
+├── StatTile
+└── StepList
+
+/products
+└── UnderConstruction
+
+/profile
+└── UnderConstruction
+
+/results
+└── ResultView
+    ├── AccordionSection
+    ├── Coil
+    └── IngredientRow
+
+/s/[scanId]/list
+├── EditableIngredientList
+│   ├── IngredientEditRow
+│   └── IngredientRow
+└── IngredientList
+    └── IngredientRow
+
+/s/[scanId]/name
+└── NameBottle
+    ├── BrandAutocomplete
+    └── TypeSelect
+
+/s/[scanId]
+├── ClearedGroups
+├── FlaggedIngredient
+├── IngredientList
+│   └── IngredientRow
+├── PickCard
+└── VerdictBlock
+    └── VerdictPill
+
+/scan
+├── BarcodeCapture
+│   └── Viewfinder
+├── LabelCapture
+│   ├── ManualIngredients
+│   │   └── IngredientTypeahead
+│   ├── ScanError
+│   └── ScanProgress
+│       └── CoilLoader
+└── ScanModeTabs
+
+/search
+└── Search
+    ├── FreshnessBadge
+    ├── TypeFilter
+    └── VerdictPill
+
+/useful
+└── UnderConstruction
+
+
+RENDERED BY
+
+AccordionSection        ResultView
+BarcodeCapture          /scan
+BrandAutocomplete       NameBottle
+BrandField              ProductForm
+CautionNote             /p/[id]
+ClearedGroups           /s/[scanId]
+Coil                    ResultView
+CoilLoader              ScanProgress
+CurlMark                Header
+EditableIngredientList  /s/[scanId]/list
+FlaggedIngredient       /s/[scanId]
+FreshnessBadge          Search
+GroupChip               /
+Header                  layout
+IngredientEditRow       EditableIngredientList
+IngredientList          /s/[scanId], /s/[scanId]/list
+IngredientRow           /p/[id], EditableIngredientList, IngredientList, ResultView
+IngredientTypeahead     ManualIngredients
+LabelCapture            /scan
+LastChecked             /p/[id]
+ManualIngredients       LabelCapture
+NameBottle              /s/[scanId]/name
+PickCard                /s/[scanId]
+ProductCheck            /p/[id]
+RescanBanner            Uploader
+ResultView              /results, Uploader
+ScanCta                 /
+ScanError               LabelCapture
+ScanForm                Uploader
+ScanModeTabs            /scan
+ScanProgress            LabelCapture
+Search                  /search
+SearchRow               /
+Section                 /
+SectionLabel            /
+SiteFooter              /
+SoftBox                 /
+StatTile                /
+StepList                /
+TextField               ProductForm
+ThemeToggle             Header
+TypeFilter              Search
+TypeSelect              NameBottle
+UnderConstruction       /aboutme, /products, /profile, /useful
+VerdictBlock            /s/[scanId]
+VerdictPill             /p/[id], Search, VerdictBlock
+Viewfinder              BarcodeCapture
+WaveDivider             Section
+
+
+NOT RENDERED ANYWHERE
+
+ArticleRow
+ProductForm
+Uploader
